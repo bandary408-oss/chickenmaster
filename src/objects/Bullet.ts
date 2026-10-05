@@ -2,16 +2,47 @@ import Phaser from 'phaser';
 import { GAME_HEIGHT, GAME_WIDTH } from '../config';
 
 const MARGIN = 16;
+const DEG = Math.PI / 180;
+
+export interface BulletStyle {
+  texture: string;
+  /** 판정 반지름. 그림보다 작게 잡아 억울한 피격을 줄인다. */
+  radius: number;
+}
+
+export interface BulletMotion {
+  accel?: number;
+  maxSpeed?: number;
+  curveDegPerSec?: number;
+}
 
 // 플레이어 탄과 적탄이 같이 쓰는 풀링 대상 탄.
 export class Bullet extends Phaser.Physics.Arcade.Image {
   damage = 1;
+  /** 이 탄으로 이미 그레이즈 판정을 받았는지 */
+  grazed = false;
+  private speed = 0;
+  private angleRad = 0;
+  private accel = 0;
+  private maxSpeed = 0;
+  private curve = 0;
 
-  fire(x: number, y: number, vx: number, vy: number, damage = 1) {
+  fire(x: number, y: number, angle: number, speed: number, damage = 1, style?: BulletStyle, motion?: BulletMotion) {
+    if (style && this.texture.key !== style.texture) {
+      this.setTexture(style.texture);
+    }
     this.enableBody(true, x, y, true, true);
-    this.setVelocity(vx, vy);
-    this.setRotation(Math.atan2(vy, vx));
+    if (style) {
+      this.body!.setCircle(style.radius, this.width / 2 - style.radius, this.height / 2 - style.radius);
+    }
     this.damage = damage;
+    this.grazed = false;
+    this.speed = speed;
+    this.angleRad = angle;
+    this.accel = motion?.accel ?? 0;
+    this.maxSpeed = motion?.maxSpeed ?? Infinity;
+    this.curve = (motion?.curveDegPerSec ?? 0) * DEG;
+    this.applyVelocity();
   }
 
   kill() {
@@ -19,14 +50,25 @@ export class Bullet extends Phaser.Physics.Arcade.Image {
   }
 
   // 그룹의 runChildUpdate로 매 프레임 호출된다.
-  update() {
+  update(_time: number, delta: number) {
     if (!this.active) return;
+    if (this.accel !== 0 || this.curve !== 0) {
+      const dt = delta / 1000;
+      this.speed = Math.min(this.maxSpeed, Math.max(0, this.speed + this.accel * dt));
+      this.angleRad += this.curve * dt;
+      this.applyVelocity();
+    }
     if (
       this.x < -MARGIN || this.x > GAME_WIDTH + MARGIN ||
       this.y < -MARGIN || this.y > GAME_HEIGHT + MARGIN
     ) {
       this.kill();
     }
+  }
+
+  private applyVelocity() {
+    this.setVelocity(Math.cos(this.angleRad) * this.speed, Math.sin(this.angleRad) * this.speed);
+    this.setRotation(this.angleRad);
   }
 }
 
@@ -48,9 +90,22 @@ export function createBulletGroup(scene: Phaser.Scene, texture: string, maxSize:
   return group;
 }
 
-export function spawnBullet(group: Phaser.Physics.Arcade.Group, x: number, y: number, vx: number, vy: number, damage = 1) {
+export function spawnBullet(
+  group: Phaser.Physics.Arcade.Group,
+  x: number,
+  y: number,
+  angle: number,
+  speed: number,
+  damage = 1,
+  style?: BulletStyle,
+  motion?: BulletMotion,
+) {
   const b = group.getFirstDead(false) as Bullet | null;
   if (!b) return null;
-  b.fire(x, y, vx, vy, damage);
+  b.fire(x, y, angle, speed, damage, style, motion);
   return b;
+}
+
+export function countActive(group: Phaser.Physics.Arcade.Group) {
+  return group.countActive(true);
 }

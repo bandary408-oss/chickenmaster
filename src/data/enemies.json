@@ -10,13 +10,27 @@
     "hp": 3,
     "score": 100,
     "move": { "kind": "sine", "speed": 90, "amplitude": 30, "frequency": 2 },
-    "fire": { "intervalMs": 1600, "count": 1, "spreadDeg": 0, "speed": 130, "aimed": true, "firstDelayMs": 600 }
+    "fire": { "pattern": "aimed_single", "intervalMs": 1600, "firstDelayMs": 600 }
+  },
+  "sprayer": {
+    "texture": "enemy_drone",
+    "hp": 6,
+    "score": 200,
+    "move": { "kind": "hold", "speed": 140, "holdX": 520, "holdMs": 3500 },
+    "fire": { "pattern": "random_spray", "intervalMs": 1500, "firstDelayMs": 500 }
   },
   "gunship": {
     "texture": "enemy_gunship",
     "hp": 30,
     "score": 800,
     "move": { "kind": "hold", "speed": 120, "holdX": 480, "holdMs": 7000 },
-    "fire": { "intervalMs": 900, "count": 5, "spreadDeg": 60, "speed": 110, "aimed": true, "firstDelayMs": 800 }
+    "fire": { "pattern": "aimed_fan5", "intervalMs": 900, "firstDelayMs": 800 }
+  },
+  "spinner": {
+    "texture": "enemy_spinner",
+    "hp": 45,
+    "score": 1500,
+    "move": { "kind": "hold", "speed": 100, "holdX": 500, "holdMs": 8000 },
+    "fire": { "pattern": "spiral", "intervalMs": 2600, "firstDelayMs": 700 }
   }
 }

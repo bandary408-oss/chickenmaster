@@ -33,4 +33,9 @@ export const PLAYER = {
   hitClearRadius: 80,
   bulletHitDamage: 20,
   bodyHitDamage: 25,
+  // 적탄 중심이 이 거리 안을 스치면 그레이즈 (기획서 6장)
+  grazeRadius: 14,
 } as const;
+
+/** 적탄 풀 크기. 기획서 6장 목표: 1,000발에서 60fps. */
+export const ENEMY_BULLET_POOL = 1500;

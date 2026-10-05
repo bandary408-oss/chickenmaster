@@ -3,13 +3,47 @@ export type MoveDef =
   | { kind: 'sine'; speed: number; amplitude: number; frequency: number }
   | { kind: 'hold'; speed: number; holdX: number; holdMs: number };
 
-// 2단계용 단순 발사 정의. 3단계 탄막 시스템에서 패턴 데이터로 확장한다.
-export interface FireDef {
-  intervalMs: number;
+export type BulletKind = 'small' | 'large';
+
+/**
+ * 탄막 패턴 하나. 빠진 값은 PATTERN_DEFAULTS로 채운다.
+ * - 조준탄: aim "player", count 1
+ * - 부채꼴: count N, spreadDeg < 360
+ * - 원형: spreadDeg 360
+ * - 나선: 원형 + bursts 여러 번 + rotateDegPerBurst
+ * - 랜덤: randomAngleDeg / randomSpeed
+ */
+export interface PatternDef {
+  /** player: 플레이어를 향해, fixed: angleDeg 방향 (180 = 왼쪽) */
+  aim: 'player' | 'fixed';
+  angleDeg: number;
+  /** 한 번에 쏘는 탄 수 */
   count: number;
+  /** 탄이 퍼지는 전체 각도. 360이면 원형으로 고르게 */
   spreadDeg: number;
   speed: number;
-  aimed: boolean;
+  /** 같은 각도로 속도만 다르게 겹쳐 쏘는 줄 수 */
+  layers: number;
+  speedStep: number;
+  /** 연속 발사 횟수와 간격 */
+  bursts: number;
+  burstGapMs: number;
+  /** 연속 발사마다 회전 (나선) */
+  rotateDegPerBurst: number;
+  /** 연속 발사마다 플레이어를 다시 조준할지 */
+  reaimEachBurst: boolean;
+  randomAngleDeg: number;
+  randomSpeed: number;
+  /** 탄 자체의 가속도(px/s²)와 최대 속도, 휘어짐(도/초) */
+  accel: number;
+  maxSpeed: number;
+  curveDegPerSec: number;
+  bullet: BulletKind;
+}
+
+export interface FireDef {
+  pattern: string;
+  intervalMs: number;
   firstDelayMs: number;
 }
 

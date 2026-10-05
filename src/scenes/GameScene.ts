@@ -1,11 +1,12 @@
 import Phaser from 'phaser';
-import { COLORS, GAME_HEIGHT, GAME_WIDTH, PLAYER } from '../config';
+import { COLORS, ENEMY_BULLET_POOL, GAME_HEIGHT, GAME_WIDTH, PLAYER } from '../config';
 import enemyDefs from '../data/enemies.json';
 import stage0 from '../data/stage0.json';
 import type { EnemyDef, StageDef, WaveDef } from '../data/types';
 import { Bullet, createBulletGroup, spawnBullet } from '../objects/Bullet';
 import { Enemy, type EnemyHost } from '../objects/Enemy';
 import { Player } from '../objects/Player';
+import { firePattern, getPattern } from '../systems/BulletPatterns';
 import { Hud } from '../ui/Hud';
 
 const ENEMIES = enemyDefs as Record<string, EnemyDef>;
@@ -13,13 +14,14 @@ const STAGE = stage0 as StageDef;
 
 type Star = { obj: Phaser.GameObjects.Image; speed: number };
 
-// 2단계 핵심 루프: 이동, 사격, 적 웨이브, 적탄, 피격, 게임 오버.
+// 핵심 루프: 이동, 사격, 적 웨이브, 탄막, 그레이즈, 피격, 게임 오버.
 export class GameScene extends Phaser.Scene implements EnemyHost {
   private player!: Player;
   private playerBullets!: Phaser.Physics.Arcade.Group;
   private enemyBullets!: Phaser.Physics.Arcade.Group;
   private enemies!: Phaser.Physics.Arcade.Group;
   private sparks!: Phaser.GameObjects.Particles.ParticleEmitter;
+  private grazeFx!: Phaser.GameObjects.Particles.ParticleEmitter;
   private hud!: Hud;
   private stars: Star[] = [];
 
@@ -32,6 +34,7 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
   private waveIndex = 0;
   private nextShotAt = 0;
   private score = 0;
+  private graze = 0;
   private gameOver = false;
 
   constructor() {
@@ -44,6 +47,7 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
     this.waveIndex = 0;
     this.nextShotAt = 0;
     this.score = 0;
+    this.graze = 0;
     this.gameOver = false;
     // 게임 오버로 멈춘 물리 월드는 씬을 다시 시작해도 멈춘 채 남는다.
     this.physics.resume();
@@ -51,7 +55,7 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
     this.createStarfield();
 
     this.playerBullets = createBulletGroup(this, 'bullet_player', 64, 2);
-    this.enemyBullets = createBulletGroup(this, 'bullet_enemy', 600, 2);
+    this.enemyBullets = createBulletGroup(this, 'bullet_enemy', ENEMY_BULLET_POOL, 2);
     this.enemies = this.physics.add.group({ classType: Enemy, maxSize: 48, runChildUpdate: false });
 
     this.player = new Player(this, GAME_WIDTH * 0.2, GAME_HEIGHT / 2);
@@ -61,6 +65,13 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
       lifespan: 350,
       scale: { start: 1.5, end: 0 },
       tint: [0xffd23f, 0xff4f78, 0xffffff],
+      emitting: false,
+    });
+    this.grazeFx = this.add.particles(0, 0, 'graze', {
+      speed: { min: 20, max: 60 },
+      lifespan: 200,
+      alpha: { start: 0.9, end: 0 },
+      scale: { start: 1, end: 0.3 },
       emitting: false,
     });
 
@@ -78,7 +89,7 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
     kb.on('keydown-ESC', () => this.scene.start('Title'));
 
     this.hud = new Hud(this);
-    this.hud.update(this.player.hp, this.score);
+    this.hud.update(this.player.hp, this.score, this.graze);
   }
 
   update(time: number, delta: number) {
@@ -88,22 +99,14 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
     this.updateWaves(delta);
     this.updatePlayer(time);
     this.enemies.getChildren().forEach((e) => (e as Enemy).tick(delta, this));
-    this.hud.update(this.player.hp, this.score);
+    this.checkGraze();
+    this.hud.update(this.player.hp, this.score, this.graze);
   }
 
   // --- 적 ---
 
   enemyFire(enemy: Enemy) {
-    const f = enemy.def.fire!;
-    const base = f.aimed
-      ? Phaser.Math.Angle.Between(enemy.x, enemy.y, this.player.x, this.player.y)
-      : Math.PI;
-    const spread = Phaser.Math.DegToRad(f.spreadDeg);
-    for (let i = 0; i < f.count; i++) {
-      const t = f.count === 1 ? 0 : i / (f.count - 1) - 0.5;
-      const a = base + spread * t;
-      spawnBullet(this.enemyBullets, enemy.x, enemy.y, Math.cos(a) * f.speed, Math.sin(a) * f.speed);
-    }
+    firePattern(this, this.enemyBullets, getPattern(enemy.def.fire!.pattern), enemy, this.player);
   }
 
   private updateWaves(delta: number) {
@@ -153,7 +156,7 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
     this.player.move(Number(right) - Number(left), Number(down) - Number(up), this.focusKey.isDown, time);
 
     if (this.fireKey.isDown && time >= this.nextShotAt) {
-      spawnBullet(this.playerBullets, this.player.x + 12, this.player.y, PLAYER.bulletSpeed, 0, PLAYER.bulletDamage);
+      spawnBullet(this.playerBullets, this.player.x + 12, this.player.y, 0, PLAYER.bulletSpeed, PLAYER.bulletDamage);
       this.nextShotAt = time + PLAYER.fireIntervalMs;
     }
   }
@@ -164,6 +167,27 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
     bullet?.kill();
     this.clearEnemyBulletsNear(this.player.x, this.player.y, PLAYER.hitClearRadius);
     if (!this.player.alive) this.onGameOver();
+  }
+
+  /** 적탄이 히트박스를 아슬아슬하게 스치면 탄마다 한 번씩 그레이즈로 센다. */
+  private checkGraze() {
+    if (!this.player.alive) return;
+    const px = this.player.x;
+    const py = this.player.y;
+    const r2 = PLAYER.grazeRadius * PLAYER.grazeRadius;
+    const list = this.enemyBullets.getChildren();
+    for (let i = 0; i < list.length; i++) {
+      const b = list[i] as Bullet;
+      if (!b.active || b.grazed) continue;
+      const dx = b.x - px;
+      const dy = b.y - py;
+      if (dx * dx + dy * dy <= r2) {
+        b.grazed = true;
+        this.graze++;
+        this.score += 10;
+        this.grazeFx.explode(3, (px + b.x) / 2, (py + b.y) / 2);
+      }
+    }
   }
 
   private clearEnemyBulletsNear(x: number, y: number, radius: number) {
@@ -180,7 +204,7 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
     this.gameOver = true;
     this.sparks.explode(60, this.player.x, this.player.y);
     this.player.explode();
-    this.hud.update(0, this.score);
+    this.hud.update(0, this.score, this.graze);
     this.physics.pause();
 
     const cx = GAME_WIDTH / 2;

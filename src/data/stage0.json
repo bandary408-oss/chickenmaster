@@ -1,15 +1,19 @@
 {
-  "loopAfterMs": 32000,
+  "loopAfterMs": 44000,
   "waves": [
     { "atMs": 1000,  "type": "drone",   "count": 4, "gapMs": 350, "y": 0.3 },
     { "atMs": 3500,  "type": "drone",   "count": 4, "gapMs": 350, "y": 0.7 },
     { "atMs": 6000,  "type": "dart",    "count": 6, "gapMs": 180, "y": "random" },
-    { "atMs": 9000,  "type": "gunship", "count": 1, "gapMs": 0,   "y": 0.5 },
-    { "atMs": 12000, "type": "drone",   "count": 5, "gapMs": 300, "y": 0.2 },
-    { "atMs": 14000, "type": "drone",   "count": 5, "gapMs": 300, "y": 0.8 },
-    { "atMs": 17000, "type": "dart",    "count": 8, "gapMs": 150, "y": "random" },
-    { "atMs": 20000, "type": "gunship", "count": 1, "gapMs": 0,   "y": 0.3 },
-    { "atMs": 20500, "type": "gunship", "count": 1, "gapMs": 0,   "y": 0.7 },
-    { "atMs": 26000, "type": "drone",   "count": 6, "gapMs": 250, "y": 0.5 }
+    { "atMs": 8000,  "type": "sprayer", "count": 2, "gapMs": 600, "y": "random" },
+    { "atMs": 11000, "type": "gunship", "count": 1, "gapMs": 0,   "y": 0.5 },
+    { "atMs": 14000, "type": "drone",   "count": 5, "gapMs": 300, "y": 0.2 },
+    { "atMs": 16000, "type": "drone",   "count": 5, "gapMs": 300, "y": 0.8 },
+    { "atMs": 19000, "type": "dart",    "count": 8, "gapMs": 150, "y": "random" },
+    { "atMs": 22000, "type": "spinner", "count": 1, "gapMs": 0,   "y": 0.5 },
+    { "atMs": 25000, "type": "drone",   "count": 4, "gapMs": 400, "y": 0.15 },
+    { "atMs": 31000, "type": "gunship", "count": 1, "gapMs": 0,   "y": 0.3 },
+    { "atMs": 31500, "type": "gunship", "count": 1, "gapMs": 0,   "y": 0.7 },
+    { "atMs": 36000, "type": "sprayer", "count": 3, "gapMs": 500, "y": "random" },
+    { "atMs": 39000, "type": "drone",   "count": 6, "gapMs": 250, "y": 0.5 }
   ]
 }

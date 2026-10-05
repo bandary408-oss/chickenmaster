@@ -31,6 +31,19 @@ export class BootScene extends Phaser.Scene {
       g.fillStyle(0xffffff).fillCircle(4, 4, 2);
     });
 
+    bake('bullet_enemy_large', 14, 14, () => {
+      g.fillStyle(COLORS.enemyBullet).fillCircle(7, 7, 7);
+      g.fillStyle(0xffffff).fillCircle(7, 7, 4);
+    });
+
+    bake('graze', 3, 3, () => g.fillStyle(0xffffff).fillRect(0, 0, 3, 3));
+
+    bake('enemy_spinner', 28, 28, () => {
+      g.fillStyle(COLORS.enemyBodyHeavy).fillCircle(14, 14, 14);
+      g.fillStyle(COLORS.enemyBody).fillCircle(14, 14, 9);
+      g.fillStyle(COLORS.enemyBullet).fillCircle(14, 14, 4);
+    });
+
     bake('enemy_dart', 16, 10, () => {
       g.fillStyle(COLORS.enemyBody).fillTriangle(0, 5, 16, 0, 16, 10);
     });
