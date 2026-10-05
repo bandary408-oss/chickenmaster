@@ -16,8 +16,8 @@ npm run build    # 타입 검사 후 dist/ 에 빌드
 | 입력 | 동작 |
 |---|---|
 | 방향키 / WASD | 이동 |
-| Shift | 정밀 이동(감속) |
-| Z / Enter | 타이틀에서 시작 |
+| Z (홀드) | 사격 / 타이틀에서 시작 / 게임 오버 후 재시작 |
+| Shift | 정밀 이동(감속) + 히트박스 표시 |
 | Esc | 타이틀로 돌아가기 |
 
 ## 구조
@@ -25,9 +25,20 @@ npm run build    # 타입 검사 후 dist/ 에 빌드
 ```
 src/
   main.ts          Phaser 게임 설정
-  config.ts        해상도(640×360), 색상 상수
+  config.ts        해상도(640×360), 색상, 플레이어 기본 성능
+  data/
+    enemies.json   적 종류별 체력, 점수, 이동, 발사 정의
+    stage0.json    웨이브 타임라인 (시간, 적 종류, 수, 높이)
+    types.ts       위 데이터의 타입
+  objects/
+    Bullet.ts      풀링되는 탄 (플레이어 탄, 적탄 공용)
+    Enemy.ts       적 이동(직진, 사인파, 정지 후 사격)과 발사 타이밍
+    Player.ts      이동, 히트박스, 피격 무적
+  ui/Hud.ts        체력 바, 점수
   scenes/
     BootScene.ts   플레이스홀더 텍스처 생성
     TitleScene.ts  타이틀 화면
-    GameScene.ts   스크롤 배경 + 플레이어 이동
+    GameScene.ts   핵심 루프: 사격, 웨이브, 충돌, 게임 오버
 ```
+
+적이나 웨이브를 바꾸려면 `src/data/*.json`만 고치면 된다.

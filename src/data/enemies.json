@@ -1,0 +1,22 @@
+{
+  "dart": {
+    "texture": "enemy_dart",
+    "hp": 1,
+    "score": 50,
+    "move": { "kind": "straight", "speed": 220 }
+  },
+  "drone": {
+    "texture": "enemy_drone",
+    "hp": 3,
+    "score": 100,
+    "move": { "kind": "sine", "speed": 90, "amplitude": 30, "frequency": 2 },
+    "fire": { "intervalMs": 1600, "count": 1, "spreadDeg": 0, "speed": 130, "aimed": true, "firstDelayMs": 600 }
+  },
+  "gunship": {
+    "texture": "enemy_gunship",
+    "hp": 30,
+    "score": 800,
+    "move": { "kind": "hold", "speed": 120, "holdX": 480, "holdMs": 7000 },
+    "fire": { "intervalMs": 900, "count": 5, "spreadDeg": 60, "speed": 110, "aimed": true, "firstDelayMs": 800 }
+  }
+}
