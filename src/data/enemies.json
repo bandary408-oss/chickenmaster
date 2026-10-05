@@ -3,34 +3,139 @@
     "texture": "enemy_dart",
     "hp": 1,
     "score": 50,
-    "move": { "kind": "straight", "speed": 220 }
+    "move": {
+      "kind": "straight",
+      "speed": 220
+    }
   },
   "drone": {
     "texture": "enemy_drone",
     "hp": 3,
     "score": 100,
-    "move": { "kind": "sine", "speed": 90, "amplitude": 30, "frequency": 2 },
-    "fire": { "pattern": "aimed_single", "intervalMs": 1600, "firstDelayMs": 600 }
+    "move": {
+      "kind": "sine",
+      "speed": 90,
+      "amplitude": 30,
+      "frequency": 2
+    },
+    "fire": {
+      "pattern": "aimed_single",
+      "intervalMs": 1600,
+      "firstDelayMs": 600
+    }
   },
   "sprayer": {
     "texture": "enemy_drone",
     "hp": 6,
     "score": 200,
-    "move": { "kind": "hold", "speed": 140, "holdX": 520, "holdMs": 3500 },
-    "fire": { "pattern": "random_spray", "intervalMs": 1500, "firstDelayMs": 500 }
+    "move": {
+      "kind": "hold",
+      "speed": 140,
+      "holdX": 520,
+      "holdMs": 3500
+    },
+    "fire": {
+      "pattern": "random_spray",
+      "intervalMs": 1500,
+      "firstDelayMs": 500
+    }
   },
   "gunship": {
     "texture": "enemy_gunship",
     "hp": 30,
     "score": 800,
-    "move": { "kind": "hold", "speed": 120, "holdX": 480, "holdMs": 7000 },
-    "fire": { "pattern": "aimed_fan5", "intervalMs": 900, "firstDelayMs": 800 }
+    "move": {
+      "kind": "hold",
+      "speed": 120,
+      "holdX": 480,
+      "holdMs": 7000
+    },
+    "fire": {
+      "pattern": "aimed_fan5",
+      "intervalMs": 900,
+      "firstDelayMs": 800
+    }
   },
   "spinner": {
     "texture": "enemy_spinner",
     "hp": 45,
     "score": 1500,
-    "move": { "kind": "hold", "speed": 100, "holdX": 500, "holdMs": 8000 },
-    "fire": { "pattern": "spiral", "intervalMs": 2600, "firstDelayMs": 700 }
+    "move": {
+      "kind": "hold",
+      "speed": 100,
+      "holdX": 500,
+      "holdMs": 8000
+    },
+    "fire": {
+      "pattern": "spiral",
+      "intervalMs": 2600,
+      "firstDelayMs": 700
+    }
+  },
+  "boss_rooster": {
+    "texture": "enemy_boss_rooster",
+    "hp": 600,
+    "score": 10000,
+    "boss": true,
+    "name": "강철 수탉 MK-I",
+    "move": {
+      "kind": "boss",
+      "speed": 80,
+      "holdX": 520,
+      "amplitude": 90,
+      "frequency": 0.12
+    },
+    "phases": [
+      {
+        "untilHpPct": 0.66,
+        "fires": [
+          {
+            "pattern": "aimed_fan5",
+            "intervalMs": 900,
+            "firstDelayMs": 1200
+          },
+          {
+            "pattern": "ring16",
+            "intervalMs": 2200,
+            "firstDelayMs": 2000
+          }
+        ]
+      },
+      {
+        "untilHpPct": 0.33,
+        "fires": [
+          {
+            "pattern": "spiral_double",
+            "intervalMs": 2400,
+            "firstDelayMs": 500
+          },
+          {
+            "pattern": "aimed_stream",
+            "intervalMs": 1400,
+            "firstDelayMs": 900
+          }
+        ]
+      },
+      {
+        "untilHpPct": 0,
+        "fires": [
+          {
+            "pattern": "ring_layered",
+            "intervalMs": 1800,
+            "firstDelayMs": 400
+          },
+          {
+            "pattern": "random_spray",
+            "intervalMs": 900,
+            "firstDelayMs": 700
+          },
+          {
+            "pattern": "accel_fan",
+            "intervalMs": 2600,
+            "firstDelayMs": 1500
+          }
+        ]
+      }
+    ]
   }
 }

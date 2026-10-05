@@ -1,0 +1,26 @@
+{
+  "derelict_freighter": {
+    "title": "버려진 제국 수송선",
+    "text": "화물칸 문이 반쯤 열린 수송선이 떠 있다.\n\"저 안에 무슨 파츠가 있을지… 아니야, 함정일 수도. 하지만 파츠가!\"",
+    "choices": [
+      { "label": "뒤진다", "detail": "스크랩 +60, 체력 -15", "effects": { "scrap": 60, "hp": -15 } },
+      { "label": "그냥 지나간다", "detail": "아무 일도 없다", "effects": {} }
+    ]
+  },
+  "junk_dealer": {
+    "title": "수상한 고물상",
+    "text": "\"싸다 싸! 출처는 묻지 마!\"\n좌판에 낯선 파츠들이 굴러다닌다.",
+    "choices": [
+      { "label": "산다", "detail": "스크랩 -50, 파츠 3개 중 하나 고르기", "effects": { "scrap": -50, "reward": true } },
+      { "label": "거절한다", "detail": "\"메카 덕후는 감정을 앞세우지 않는다… 아마도.\"", "effects": {} }
+    ]
+  },
+  "repair_drone": {
+    "title": "길 잃은 제국 정비 드론",
+    "text": "제국 정비 드론 한 대가 고장 나서 빙글빙글 돌고 있다.\n\"해킹하면 내 편이 될지도?\"",
+    "choices": [
+      { "label": "수리를 시킨다", "detail": "체력 +30", "effects": { "hp": 30 } },
+      { "label": "분해한다", "detail": "스크랩 +40", "effects": { "scrap": 40 } }
+    ]
+  }
+}

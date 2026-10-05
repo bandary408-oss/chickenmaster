@@ -56,6 +56,10 @@ export interface PartDef {
   /** 외형이 바뀌는 계열만 가진다 (기획서 5.2.1) */
   visual?: WeaponVisual | ArmorVisual | BoosterVisual;
   coreColor?: string;
+  /** Lv3에서 고를 수 있는 개조형 파츠 id 2개 (기획서 5.2) */
+  branches?: string[];
+  /** 개조형이면 원래 파츠 id. 보상 목록에 따로 나오지 않는다. */
+  branchOf?: string;
   levels: PartLevel[];
 }
 

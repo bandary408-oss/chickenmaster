@@ -44,6 +44,22 @@ export class BootScene extends Phaser.Scene {
       g.fillStyle(COLORS.enemyBullet).fillCircle(14, 14, 4);
     });
 
+    // 섹터 보스: 강철 수탉 MK-I (왼쪽을 바라보는 거대 닭 메카)
+    bake('enemy_boss_rooster', 84, 72, () => {
+      g.fillStyle(COLORS.enemyBodyHeavy).fillRect(20, 22, 54, 38); // 몸통
+      g.fillStyle(COLORS.enemyBody).fillRect(26, 26, 42, 30);
+      g.fillStyle(0x3a4466).fillTriangle(74, 18, 84, 30, 74, 52).fillTriangle(70, 10, 82, 14, 72, 30); // 꽁지 날개
+      g.fillStyle(COLORS.enemyBody).fillRect(8, 8, 24, 22); // 머리
+      g.fillStyle(0xff4f78).fillTriangle(10, 8, 16, 0, 20, 8).fillTriangle(18, 8, 24, 0, 28, 8); // 볏
+      g.fillStyle(0xffd23f).fillTriangle(0, 18, 8, 14, 8, 22); // 부리
+      g.fillStyle(0xff4f78).fillRect(8, 22, 5, 7); // 턱살
+      g.fillStyle(0xffffff).fillRect(13, 13, 5, 5);
+      g.fillStyle(0xff4f78).fillRect(14, 14, 3, 3); // 눈
+      g.fillStyle(0x8b9bb4).fillRect(30, 60, 6, 12).fillRect(54, 60, 6, 12); // 다리
+      g.fillStyle(COLORS.enemyBullet).fillCircle(46, 41, 7); // 코어
+      g.fillStyle(0xffffff).fillCircle(46, 41, 3);
+    });
+
     bake('enemy_dart', 16, 10, () => {
       g.fillStyle(COLORS.enemyBody).fillTriangle(0, 5, 16, 0, 16, 10);
     });

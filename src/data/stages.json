@@ -1,0 +1,56 @@
+{
+  "battle_a": {
+    "name": "제국 초계선단",
+    "waves": [
+      { "atMs": 1000,  "type": "drone",   "count": 4, "gapMs": 350, "y": 0.3 },
+      { "atMs": 3500,  "type": "drone",   "count": 4, "gapMs": 350, "y": 0.7 },
+      { "atMs": 6500,  "type": "dart",    "count": 6, "gapMs": 180, "y": "random" },
+      { "atMs": 9000,  "type": "sprayer", "count": 2, "gapMs": 700, "y": "random" },
+      { "atMs": 13000, "type": "gunship", "count": 1, "gapMs": 0,   "y": 0.5 },
+      { "atMs": 17000, "type": "drone",   "count": 5, "gapMs": 300, "y": 0.2 },
+      { "atMs": 19000, "type": "drone",   "count": 5, "gapMs": 300, "y": 0.8 },
+      { "atMs": 23000, "type": "dart",    "count": 8, "gapMs": 150, "y": "random" }
+    ]
+  },
+  "battle_b": {
+    "name": "양산형 메카 공장 외곽",
+    "waves": [
+      { "atMs": 1000,  "type": "dart",    "count": 8, "gapMs": 160, "y": "random" },
+      { "atMs": 4000,  "type": "gunship", "count": 1, "gapMs": 0,   "y": 0.3 },
+      { "atMs": 4500,  "type": "drone",   "count": 4, "gapMs": 350, "y": 0.75 },
+      { "atMs": 9000,  "type": "sprayer", "count": 3, "gapMs": 500, "y": "random" },
+      { "atMs": 13000, "type": "drone",   "count": 6, "gapMs": 250, "y": 0.5 },
+      { "atMs": 16000, "type": "gunship", "count": 1, "gapMs": 0,   "y": 0.7 },
+      { "atMs": 20000, "type": "dart",    "count": 10, "gapMs": 120, "y": "random" }
+    ]
+  },
+  "battle_c": {
+    "name": "소행성대 매복",
+    "waves": [
+      { "atMs": 1000,  "type": "sprayer", "count": 2, "gapMs": 600, "y": "random" },
+      { "atMs": 4000,  "type": "drone",   "count": 5, "gapMs": 300, "y": 0.25 },
+      { "atMs": 6000,  "type": "drone",   "count": 5, "gapMs": 300, "y": 0.75 },
+      { "atMs": 10000, "type": "spinner", "count": 1, "gapMs": 0,   "y": 0.5 },
+      { "atMs": 15000, "type": "dart",    "count": 8, "gapMs": 150, "y": "random" },
+      { "atMs": 19000, "type": "sprayer", "count": 3, "gapMs": 400, "y": "random" }
+    ]
+  },
+  "elite_a": {
+    "name": "엘리트: 제국 근위 편대",
+    "waves": [
+      { "atMs": 1000,  "type": "gunship", "count": 1, "gapMs": 0,   "y": 0.3 },
+      { "atMs": 1500,  "type": "gunship", "count": 1, "gapMs": 0,   "y": 0.7 },
+      { "atMs": 7000,  "type": "spinner", "count": 1, "gapMs": 0,   "y": 0.5 },
+      { "atMs": 9000,  "type": "drone",   "count": 6, "gapMs": 250, "y": 0.15 },
+      { "atMs": 11000, "type": "drone",   "count": 6, "gapMs": 250, "y": 0.85 },
+      { "atMs": 16000, "type": "spinner", "count": 1, "gapMs": 0,   "y": 0.3 },
+      { "atMs": 17000, "type": "sprayer", "count": 3, "gapMs": 500, "y": "random" }
+    ]
+  },
+  "boss_1": {
+    "name": "섹터 보스: 강철 수탉 MK-I",
+    "waves": [
+      { "atMs": 1500, "type": "boss_rooster", "count": 1, "gapMs": 0, "y": 0.5 }
+    ]
+  }
+}

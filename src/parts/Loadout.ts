@@ -19,9 +19,12 @@ export const PARTS: Record<string, PartDef> = Object.fromEntries(
   Object.entries(partData as unknown as Record<string, Omit<PartDef, 'id'>>).map(([id, p]) => [id, { id, ...p }]),
 );
 
-const SYNERGIES = synergyData as Record<Tag, { name: string; tiers: Record<string, StatMods> }>;
+export const SYNERGIES = synergyData as Record<Tag, { name: string; tiers: Record<string, StatMods> }>;
 
-export const MAX_LEVEL = 3;
+/** 파츠의 최고 레벨. 개조형은 1단계뿐이다. */
+export function maxLevel(id: string) {
+  return getPart(id).levels.length;
+}
 
 export function getPart(id: string): PartDef {
   const p = PARTS[id];

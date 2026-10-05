@@ -1,8 +1,9 @@
 import Phaser from 'phaser';
 import { COLORS, GAME_HEIGHT, GAME_WIDTH } from '../config';
 import { MechView } from '../objects/MechView';
-import { MAX_LEVEL, computeStats, getPart, loadLoadout, partsForSlot, saveLoadout } from '../parts/Loadout';
+import { computeStats, getPart, loadLoadout, maxLevel, partsForSlot, saveLoadout } from '../parts/Loadout';
 import type { EquippedPart, Loadout, SlotKind } from '../parts/types';
+import { levelLabel } from '../ui/text';
 
 interface Row {
   label: string;
@@ -66,7 +67,7 @@ export class GarageScene extends Phaser.Scene {
     });
 
     this.add
-      .text(GAME_WIDTH / 2, GAME_HEIGHT - 8, '↑↓ 슬롯   ←→ 파츠   Q/E 레벨   Z 출격   ESC 타이틀', { ...FONT, fontSize: '10px' })
+      .text(GAME_WIDTH / 2, GAME_HEIGHT - 8, '↑↓ 슬롯   ←→ 파츠   Q/E 레벨   Z 시험 비행   ESC 타이틀', { ...FONT, fontSize: '10px' })
       .setOrigin(0.5, 1)
       .setAlpha(0.8);
 
@@ -79,7 +80,7 @@ export class GarageScene extends Phaser.Scene {
     kb.on('keydown-E', () => this.changeLevel(1));
     kb.on('keydown-Z', () => {
       saveLoadout(this.registry, this.loadout);
-      this.scene.start('Game');
+      this.scene.start('Game', { mode: 'test' });
     });
     kb.on('keydown-ESC', () => {
       saveLoadout(this.registry, this.loadout);
@@ -100,7 +101,7 @@ export class GarageScene extends Phaser.Scene {
     const cur = row.get(this.loadout);
     const idx = options.indexOf(cur?.id ?? null);
     const next = options[Phaser.Math.Wrap(idx + d, 0, options.length)];
-    row.set(this.loadout, next ? { id: next, level: cur?.level ?? 1 } : null);
+    row.set(this.loadout, next ? { id: next, level: Math.min(cur?.level ?? 1, maxLevel(next)) } : null);
     this.refresh();
   }
 
@@ -108,14 +109,14 @@ export class GarageScene extends Phaser.Scene {
     const row = ROWS[this.cursor];
     const cur = row.get(this.loadout);
     if (!cur) return;
-    row.set(this.loadout, { ...cur, level: Phaser.Math.Clamp(cur.level + d, 1, MAX_LEVEL) });
+    row.set(this.loadout, { ...cur, level: Phaser.Math.Clamp(cur.level + d, 1, maxLevel(cur.id)) });
     this.refresh();
   }
 
   private refresh() {
     ROWS.forEach((r, i) => {
       const e = r.get(this.loadout);
-      const name = e ? `${getPart(e.id).name}  Lv${e.level}` : '- 비어 있음 -';
+      const name = e ? `${getPart(e.id).name}  ${levelLabel(e)}` : '- 비어 있음 -';
       const sel = i === this.cursor;
       this.rowTexts[i]
         .setText(`${r.label.padEnd(6)} ${sel ? '◀ ' : '  '}${name}${sel ? ' ▶' : ''}`)

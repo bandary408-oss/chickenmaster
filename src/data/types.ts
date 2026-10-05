@@ -1,7 +1,9 @@
 export type MoveDef =
   | { kind: 'straight'; speed: number }
   | { kind: 'sine'; speed: number; amplitude: number; frequency: number }
-  | { kind: 'hold'; speed: number; holdX: number; holdMs: number };
+  | { kind: 'hold'; speed: number; holdX: number; holdMs: number }
+  /** 보스: holdX까지 들어와서 화면을 떠나지 않고 위아래로 천천히 움직인다 */
+  | { kind: 'boss'; speed: number; holdX: number; amplitude: number; frequency: number };
 
 export type BulletKind = 'small' | 'large';
 
@@ -47,12 +49,21 @@ export interface FireDef {
   firstDelayMs: number;
 }
 
+/** 보스 페이즈: 체력 비율이 untilHpPct 아래로 떨어지면 다음 페이즈로 */
+export interface PhaseDef {
+  untilHpPct: number;
+  fires: FireDef[];
+}
+
 export interface EnemyDef {
   texture: string;
   hp: number;
   score: number;
   move: MoveDef;
   fire?: FireDef;
+  boss?: boolean;
+  name?: string;
+  phases?: PhaseDef[];
 }
 
 export interface WaveDef {
@@ -65,6 +76,8 @@ export interface WaveDef {
 }
 
 export interface StageDef {
-  loopAfterMs: number;
+  name?: string;
+  /** 있으면 끝없이 반복 (격납고 시험 비행용). 없으면 웨이브가 끝나고 적이 다 사라지면 클리어 */
+  loopAfterMs?: number;
   waves: WaveDef[];
 }

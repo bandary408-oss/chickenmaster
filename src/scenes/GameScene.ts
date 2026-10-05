@@ -1,19 +1,27 @@
 import Phaser from 'phaser';
 import { COLORS, ENEMY_BULLET_POOL, GAME_HEIGHT, GAME_WIDTH, PLAYER } from '../config';
 import enemyDefs from '../data/enemies.json';
-import stage0 from '../data/stage0.json';
-import type { EnemyDef, StageDef, WaveDef } from '../data/types';
+import stageData from '../data/stages.json';
+import stageTest from '../data/stage_test.json';
+import type { EnemyDef, FireDef, StageDef, WaveDef } from '../data/types';
 import { Bullet, createBulletGroup, spawnBullet, type BulletStyle } from '../objects/Bullet';
 import { Enemy, type EnemyHost } from '../objects/Enemy';
 import { Player } from '../objects/Player';
 import { computeStats, loadLoadout } from '../parts/Loadout';
+import { completeNode, endRun, getRun, type RunState } from '../run/RunState';
+import type { MapNode } from '../run/MapGen';
+import { UI_FONT } from '../ui/text';
 import type { PlayerBulletKind } from '../parts/types';
 import { firePattern, getPattern } from '../systems/BulletPatterns';
 import { SubWeapons } from '../systems/SubWeapons';
 import { Hud } from '../ui/Hud';
 
 const ENEMIES = enemyDefs as Record<string, EnemyDef>;
-const STAGE = stage0 as StageDef;
+const STAGES = stageData as Record<string, StageDef>;
+const TEST_STAGE = stageTest as StageDef;
+
+/** 런 모드: 지도에서 고른 노드의 스테이지. 시험 모드: 격납고에서 출격한 무한 반복 스테이지 */
+export type GameSceneData = { mode: 'run'; nodeId: number } | { mode: 'test' };
 
 type Star = { obj: Phaser.GameObjects.Image; speed: number };
 
@@ -47,9 +55,34 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
   private score = 0;
   private graze = 0;
   private gameOver = false;
+  private cleared = false;
+  private kills = 0;
+  private scrapEarned = 0;
+  private pendingSpawns = 0;
+
+  private run: RunState | null = null;
+  private node: MapNode | null = null;
+  private stage: StageDef = TEST_STAGE;
+  private hpMul = 1;
+  private boss: Enemy | null = null;
 
   constructor() {
     super('Game');
+  }
+
+  init(data: GameSceneData) {
+    this.run = null;
+    this.node = null;
+    this.stage = TEST_STAGE;
+    this.hpMul = 1;
+    if (data?.mode === 'run') {
+      this.run = getRun(this.registry);
+      if (!this.run) throw new Error('No active run');
+      this.node = this.run.map.nodes[data.nodeId];
+      this.stage = STAGES[this.node.ref!];
+      // 섹터 안쪽으로 갈수록, 엘리트일수록 적이 단단해진다.
+      this.hpMul = (1 + 0.1 * this.node.col) * (this.node.kind === 'elite' ? 1.4 : 1);
+    }
   }
 
   create() {
@@ -60,6 +93,11 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
     this.score = 0;
     this.graze = 0;
     this.gameOver = false;
+    this.cleared = false;
+    this.kills = 0;
+    this.scrapEarned = 0;
+    this.pendingSpawns = 0;
+    this.boss = null;
     // 게임 오버로 멈춘 물리 월드는 씬을 다시 시작해도 멈춘 채 남는다.
     this.physics.resume();
 
@@ -69,8 +107,10 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
     this.enemyBullets = createBulletGroup(this, 'bullet_enemy', ENEMY_BULLET_POOL, 2);
     this.enemies = this.physics.add.group({ classType: Enemy, maxSize: 48, runChildUpdate: false });
 
-    const stats = computeStats(loadLoadout(this.registry));
+    const stats = computeStats(this.run ? this.run.loadout : loadLoadout(this.registry));
     this.player = new Player(this, GAME_WIDTH * 0.2, GAME_HEIGHT / 2, stats);
+    // 런에서는 체력이 스테이지 사이에 회복되지 않는다 (기획서 7장).
+    if (this.run) this.player.hp = Math.min(this.run.hp, stats.maxHp);
     // 물리 이동이 확정된 뒤(postupdate) 외형을 판정 위치에 맞춘다.
     const sync = () => this.player.syncView();
     this.events.on(Phaser.Scenes.Events.POST_UPDATE, sync);
@@ -108,9 +148,13 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
     this.wasd = kb.addKeys({ up: 'W', down: 'S', left: 'A', right: 'D' }) as typeof this.wasd;
     this.focusKey = kb.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
     this.fireKey = kb.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
-    kb.on('keydown-ESC', () => this.scene.start('Title'));
+    kb.on('keydown-ESC', () => {
+      if (this.run) endRun(this.registry);
+      this.scene.start('Title');
+    });
 
     this.hud = new Hud(this);
+    if (this.stage.name) this.showBanner(this.stage.name);
     this.hud.update(this.player.hp, this.player.stats.maxHp, this.score, this.graze);
   }
 
@@ -118,30 +162,39 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
     this.updateStarfield(delta);
     if (this.gameOver) return;
 
-    this.updateWaves(delta);
+    if (!this.cleared) this.updateWaves(delta);
     this.updatePlayer(time);
     this.subWeapons.update(time, delta, this.fireKey.isDown);
     this.steerHomingBullets(delta);
     this.enemies.getChildren().forEach((e) => (e as Enemy).tick(delta, this));
     this.checkGraze();
     this.hud.update(this.player.hp, this.player.stats.maxHp, this.score, this.graze);
+    this.hud.updateBoss(this.boss);
+    this.checkStageClear();
   }
 
   // --- 적 ---
 
-  enemyFire(enemy: Enemy) {
-    firePattern(this, this.enemyBullets, getPattern(enemy.def.fire!.pattern), enemy, this.player);
+  enemyFire(enemy: Enemy, fire: FireDef) {
+    if (this.cleared) return;
+    firePattern(this, this.enemyBullets, getPattern(fire.pattern), enemy, this.player);
+  }
+
+  onBossPhase(enemy: Enemy) {
+    // 페이즈가 바뀌면 화면의 적탄을 지워 숨 돌릴 틈을 준다.
+    this.clearEnemyBulletsNear(enemy.x, enemy.y, 9999);
+    this.cameras.main.flash(150, 255, 255, 255);
   }
 
   private updateWaves(delta: number) {
     this.stageTime += delta;
-    const waves = STAGE.waves;
+    const waves = this.stage.waves;
     while (this.waveIndex < waves.length && this.stageTime >= waves[this.waveIndex].atMs) {
       this.launchWave(waves[this.waveIndex]);
       this.waveIndex++;
     }
-    // 2단계에서는 스테이지 끝이 없으므로 웨이브를 반복한다.
-    if (this.stageTime >= STAGE.loopAfterMs) {
+    // 시험 비행 스테이지는 끝없이 반복한다.
+    if (this.stage.loopAfterMs && this.stageTime >= this.stage.loopAfterMs) {
       this.stageTime = 0;
       this.waveIndex = 0;
     }
@@ -151,11 +204,15 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
     const def = ENEMIES[w.type];
     if (!def) throw new Error(`Unknown enemy type: ${w.type}`);
     for (let i = 0; i < w.count; i++) {
+      this.pendingSpawns++;
       this.time.delayedCall(w.gapMs * i, () => {
+        this.pendingSpawns--;
         if (this.gameOver) return;
         const ratio = w.y === 'random' ? Phaser.Math.FloatBetween(0.1, 0.9) : w.y;
         const enemy = this.enemies.get() as Enemy | null;
-        enemy?.spawn(def, GAME_WIDTH + 24, GAME_HEIGHT * ratio);
+        if (!enemy) return;
+        enemy.spawn(def, GAME_WIDTH + (def.boss ? 60 : 24), GAME_HEIGHT * ratio, this.hpMul);
+        if (def.boss) this.boss = enemy;
       });
     }
   }
@@ -169,11 +226,63 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
     } else {
       bullet.kill();
     }
-    if (enemy.takeDamage(bullet.damage) === 'dead') {
-      this.score += enemy.def.score;
-      this.sparks.explode(enemy.def.hp >= 10 ? 40 : 12, enemy.x, enemy.y);
-      enemy.kill();
+    if (enemy.takeDamage(bullet.damage) === 'dead') this.onEnemyKilled(enemy);
+  }
+
+  private onEnemyKilled(enemy: Enemy) {
+    this.score += enemy.def.score;
+    this.kills++;
+    // 스크랩: 적 점수 100점당 1, 엘리트 스테이지는 1.5배
+    this.scrapEarned += Math.ceil((enemy.def.score / 100) * (this.node?.kind === 'elite' ? 1.5 : 1));
+    this.sparks.explode(enemy.def.hp >= 10 ? 40 : 12, enemy.x, enemy.y);
+    enemy.kill();
+    if (enemy === this.boss) {
+      this.boss = null;
+      this.cameras.main.shake(600, 0.015);
+      for (let i = 0; i < 6; i++) {
+        this.time.delayedCall(i * 120, () =>
+          this.sparks.explode(40, enemy.x + Phaser.Math.Between(-30, 30), enemy.y + Phaser.Math.Between(-24, 24)),
+        );
+      }
+      // 보스가 죽으면 남은 잡몹도 함께 정리한다.
+      this.enemies.getChildren().forEach((e) => (e as Enemy).active && (e as Enemy).kill());
     }
+  }
+
+  // --- 스테이지 클리어 ---
+
+  private checkStageClear() {
+    if (this.cleared || this.stage.loopAfterMs) return;
+    const allLaunched = this.waveIndex >= this.stage.waves.length && this.pendingSpawns === 0;
+    if (!allLaunched || this.enemies.countActive(true) > 0) return;
+
+    this.cleared = true;
+    this.clearEnemyBulletsNear(this.player.x, this.player.y, 9999);
+    const bossStage = this.node?.kind === 'boss';
+    this.showBanner(bossStage ? 'SECTOR CLEAR!' : 'STAGE CLEAR', `스크랩 +${this.scrapEarned}`);
+
+    this.time.delayedCall(2200, () => {
+      const run = this.run!;
+      run.hp = this.player.hp;
+      run.score += this.score;
+      run.scrap += this.scrapEarned;
+      run.kills += this.kills;
+      completeNode(run, this.node!.id);
+      if (bossStage) this.scene.start('RunEnd', { won: true });
+      else this.scene.start('Reward', { guaranteeRare: this.node!.kind === 'elite', title: '전리품 회수' });
+    });
+  }
+
+  private showBanner(title: string, sub?: string) {
+    const cx = GAME_WIDTH / 2;
+    const t = this.add
+      .text(cx, GAME_HEIGHT * 0.4, title, { ...UI_FONT, fontSize: '22px', color: COLORS.accent })
+      .setOrigin(0.5)
+      .setDepth(200);
+    const s2 = sub
+      ? this.add.text(cx, GAME_HEIGHT * 0.52, sub, { ...UI_FONT, fontSize: '12px' }).setOrigin(0.5).setDepth(200)
+      : null;
+    this.tweens.add({ targets: [t, s2].filter(Boolean), alpha: 0, delay: 1600, duration: 400 });
   }
 
   // --- 플레이어 ---
@@ -276,6 +385,15 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
       .text(cx, GAME_HEIGHT * 0.42, 'GAME OVER', { fontFamily: 'monospace', fontSize: '28px', color: COLORS.accent })
       .setOrigin(0.5)
       .setDepth(200);
+
+    if (this.run) {
+      // 런 모드: 기체는 사라지고 런이 끝난다.
+      this.run.score += this.score;
+      this.run.kills += this.kills;
+      this.time.delayedCall(1800, () => this.scene.start('RunEnd', { won: false }));
+      return;
+    }
+
     this.add
       .text(cx, GAME_HEIGHT * 0.56, 'Z: RETRY   ESC: TITLE', { fontFamily: 'monospace', fontSize: '12px', color: COLORS.text })
       .setOrigin(0.5)

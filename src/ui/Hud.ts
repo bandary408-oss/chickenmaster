@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import { COLORS } from '../config';
+import type { Enemy } from '../objects/Enemy';
+import { UI_FONT } from './text';
 
 const BAR_X = 8;
 const BAR_Y = 8;
@@ -10,6 +12,8 @@ export class Hud {
   private bar: Phaser.GameObjects.Graphics;
   private scoreText: Phaser.GameObjects.Text;
   private grazeText: Phaser.GameObjects.Text;
+  private bossBar: Phaser.GameObjects.Graphics;
+  private bossName: Phaser.GameObjects.Text;
 
   constructor(scene: Phaser.Scene) {
     this.bar = scene.add.graphics().setDepth(100);
@@ -24,6 +28,27 @@ export class Hud {
       .text(scene.scale.width - 8, 18, '', { fontFamily: 'monospace', fontSize: '8px', color: COLORS.text })
       .setOrigin(1, 0)
       .setDepth(100);
+    this.bossBar = scene.add.graphics().setDepth(100);
+    this.bossName = scene.add
+      .text(scene.scale.width / 2, 22, '', { ...UI_FONT, fontSize: '9px', color: COLORS.accent })
+      .setOrigin(0.5, 0)
+      .setDepth(100);
+  }
+
+  /** 보스가 있으면 화면 위 가운데에 체력 바를 그린다. */
+  updateBoss(boss: Enemy | null) {
+    this.bossBar.clear();
+    if (!boss || !boss.active) {
+      this.bossName.setText('');
+      return;
+    }
+    const w = 220;
+    const x = (this.bossName.scene.scale.width - w) / 2;
+    const ratio = Phaser.Math.Clamp(boss.hp / boss.maxHp, 0, 1);
+    this.bossBar.fillStyle(COLORS.hpBarBack).fillRect(x, 14, w, 5);
+    this.bossBar.fillStyle(COLORS.enemyBullet).fillRect(x, 14, w * ratio, 5);
+    this.bossBar.lineStyle(1, 0xffffff, 0.6).strokeRect(x - 0.5, 13.5, w + 1, 6);
+    this.bossName.setText(boss.def.name ?? 'BOSS');
   }
 
   update(hp: number, maxHp: number, score: number, graze: number) {
