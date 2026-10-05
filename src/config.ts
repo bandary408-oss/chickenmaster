@@ -18,16 +18,13 @@ export const COLORS = {
   accent: '#ffd23f',
 } as const;
 
-// 플레이어 기본 성능. 4단계에서 파츠 스탯으로 대체된다.
+// 플레이어 기본 성능. 파츠 스탯은 이 값 위에 더해진다 (src/parts/Loadout.ts).
 export const PLAYER = {
   maxHp: 100,
   speed: 160,
   focusSpeed: 70,
   // 기획서 2장: 히트박스 4~6px. 지름 6px 원.
   hitboxRadius: 3,
-  fireIntervalMs: 80,
-  bulletSpeed: 480,
-  bulletDamage: 1,
   invulnMs: 1500,
   // 피격 시 이 반경 안의 적탄을 지운다 (기획서 6장).
   hitClearRadius: 80,

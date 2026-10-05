@@ -4,6 +4,7 @@ import { BootScene } from './scenes/BootScene';
 import { TitleScene } from './scenes/TitleScene';
 import { GameScene } from './scenes/GameScene';
 import { PatternLabScene } from './scenes/PatternLabScene';
+import { GarageScene } from './scenes/GarageScene';
 
 const game = new Phaser.Game({
   type: Phaser.AUTO,
@@ -20,7 +21,7 @@ const game = new Phaser.Game({
     default: 'arcade',
     arcade: { debug: false },
   },
-  scene: [BootScene, TitleScene, GameScene, PatternLabScene],
+  scene: [BootScene, TitleScene, GameScene, GarageScene, PatternLabScene],
 });
 
 // 개발 중 콘솔과 자동 테스트에서 상태를 들여다볼 수 있게 노출한다.

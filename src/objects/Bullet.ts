@@ -14,6 +14,12 @@ export interface BulletMotion {
   accel?: number;
   maxSpeed?: number;
   curveDegPerSec?: number;
+  /** 적을 몇 번 더 뚫는지 (플레이어 탄) */
+  pierce?: number;
+  /** 이 거리를 날면 사라진다 */
+  rangePx?: number;
+  /** 유도 회전 속도 rad/s. 목표는 씬이 steer()로 알려 준다. */
+  homing?: number;
 }
 
 // 플레이어 탄과 적탄이 같이 쓰는 풀링 대상 탄.
@@ -21,6 +27,12 @@ export class Bullet extends Phaser.Physics.Arcade.Image {
   damage = 1;
   /** 이 탄으로 이미 그레이즈 판정을 받았는지 */
   grazed = false;
+  pierce = 0;
+  homing = 0;
+  /** 관통탄이 같은 적을 여러 번 맞히지 않도록 기억한다. */
+  readonly hitTargets = new Set<object>();
+  private travelled = 0;
+  private range = Infinity;
   private speed = 0;
   private angleRad = 0;
   private accel = 0;
@@ -42,6 +54,11 @@ export class Bullet extends Phaser.Physics.Arcade.Image {
     this.accel = motion?.accel ?? 0;
     this.maxSpeed = motion?.maxSpeed ?? Infinity;
     this.curve = (motion?.curveDegPerSec ?? 0) * DEG;
+    this.pierce = motion?.pierce ?? 0;
+    this.homing = motion?.homing ?? 0;
+    this.range = motion?.rangePx ?? Infinity;
+    this.travelled = 0;
+    this.hitTargets.clear();
     this.applyVelocity();
   }
 
@@ -49,9 +66,22 @@ export class Bullet extends Phaser.Physics.Arcade.Image {
     this.disableBody(true, true);
   }
 
+  /** 목표 각도로 최대 homing*dt 만큼 돈다. */
+  steer(targetAngle: number, dt: number) {
+    this.angleRad = Phaser.Math.Angle.RotateTo(this.angleRad, targetAngle, this.homing * dt);
+    this.applyVelocity();
+  }
+
   // 그룹의 runChildUpdate로 매 프레임 호출된다.
   update(_time: number, delta: number) {
     if (!this.active) return;
+    if (this.range !== Infinity) {
+      this.travelled += (this.speed * delta) / 1000;
+      if (this.travelled > this.range) {
+        this.kill();
+        return;
+      }
+    }
     if (this.accel !== 0 || this.curve !== 0) {
       const dt = delta / 1000;
       this.speed = Math.min(this.maxSpeed, Math.max(0, this.speed + this.accel * dt));

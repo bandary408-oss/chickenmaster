@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { COLORS, PLAYER } from '../config';
+import { COLORS } from '../config';
 
 const BAR_X = 8;
 const BAR_Y = 8;
@@ -26,8 +26,8 @@ export class Hud {
       .setDepth(100);
   }
 
-  update(hp: number, score: number, graze: number) {
-    const ratio = Phaser.Math.Clamp(hp / PLAYER.maxHp, 0, 1);
+  update(hp: number, maxHp: number, score: number, graze: number) {
+    const ratio = Phaser.Math.Clamp(hp / maxHp, 0, 1);
     this.bar.clear();
     this.bar.fillStyle(COLORS.hpBarBack).fillRect(BAR_X, BAR_Y, BAR_W, BAR_H);
     this.bar.fillStyle(ratio > 0.3 ? COLORS.hpBar : COLORS.hpBarLow).fillRect(BAR_X, BAR_Y, BAR_W * ratio, BAR_H);

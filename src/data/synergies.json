@@ -1,0 +1,6 @@
+{
+  "energy":    { "name": "에너지", "tiers": { "2": { "fireRatePct": 10 }, "4": { "fireRatePct": 25, "grazeRadius": 4 } } },
+  "ballistic": { "name": "실탄",   "tiers": { "2": { "damagePct": 10 },   "4": { "damagePct": 25 } } },
+  "heat":      { "name": "열",     "tiers": { "2": { "lowHpDamagePct": 25 }, "4": { "lowHpDamagePct": 50, "damagePct": 10 } } },
+  "drone":     { "name": "드론",   "tiers": { "2": { "extraDrones": 1 },  "4": { "extraDrones": 2 } } }
+}

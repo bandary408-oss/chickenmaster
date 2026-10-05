@@ -19,6 +19,7 @@ npm run build    # 타입 검사 후 dist/ 에 빌드
 | Z (홀드) | 사격 / 타이틀에서 시작 / 게임 오버 후 재시작 |
 | Shift | 정밀 이동(감속) + 히트박스 표시 |
 | Esc | 타이틀로 돌아가기 |
+| G (타이틀) | 격납고: ↑↓ 슬롯, ←→ 파츠 교체, Q/E 레벨, Z 출격 |
 | P (타이틀) | 패턴 실험실: ←/→로 패턴 전환, Space로 1,000발 이상 부하 테스트 |
 
 ## 구조
@@ -29,20 +30,28 @@ src/
   config.ts        해상도(640×360), 색상, 플레이어 기본 성능
   data/
     enemies.json   적 종류별 체력, 점수, 이동, 사용할 탄막 패턴
+    parts.json     메카 파츠 16종 (슬롯, 태그, 레벨별 성능, 외형, 설명)
+    synergies.json 태그 시너지 (같은 태그 2개/4개 장착 보너스)
     patterns.json  탄막 패턴 (조준, 부채꼴, 원형, 나선, 랜덤, 가속·휘는 탄)
     stage0.json    웨이브 타임라인 (시간, 적 종류, 수, 높이)
     types.ts       위 데이터의 타입
+  parts/
+    Loadout.ts     장착 상태 → 최종 성능 계산 (스탯 합산, 시너지, 외형)
+    types.ts       파츠 관련 타입
   objects/
+    MechView.ts    파츠별로 겹쳐 그리는 메카 외형
     Bullet.ts      풀링되는 탄 (플레이어 탄, 적탄 공용)
     Enemy.ts       적 이동(직진, 사인파, 정지 후 사격)과 발사 타이밍
-    Player.ts      이동, 히트박스, 피격 무적
+    Player.ts      이동, 히트박스, 피격 무적 (성능은 Loadout에서)
   systems/
     BulletPatterns.ts  patterns.json을 읽어 탄을 뿌리는 발사기
+    SubWeapons.ts  보조무기 (드론, 실드 비트, 측면 포탑)
   ui/Hud.ts        체력 바, 점수, 그레이즈
   scenes/
     BootScene.ts   플레이스홀더 텍스처 생성
     TitleScene.ts  타이틀 화면
     GameScene.ts   핵심 루프: 사격, 웨이브, 탄막, 그레이즈, 게임 오버
+    GarageScene.ts 격납고 (파츠 장착 테스트)
     PatternLabScene.ts  탄막 패턴 확인용 실험실
 ```
 

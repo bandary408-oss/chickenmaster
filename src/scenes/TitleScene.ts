@@ -36,12 +36,13 @@ export class TitleScene extends Phaser.Scene {
     this.tweens.add({ targets: prompt, alpha: 0.2, duration: 600, yoyo: true, repeat: -1 });
 
     this.add
-      .text(cx, GAME_HEIGHT - 10, 'P: PATTERN LAB', { fontFamily: 'monospace', fontSize: '8px', color: COLORS.text })
+      .text(cx, GAME_HEIGHT - 10, 'G: HANGAR   P: PATTERN LAB', { fontFamily: 'monospace', fontSize: '8px', color: COLORS.text })
       .setOrigin(0.5, 1)
       .setAlpha(0.6);
 
     const start = () => this.scene.start('Game');
     this.input.keyboard?.once('keydown-P', () => this.scene.start('PatternLab'));
+    this.input.keyboard?.once('keydown-G', () => this.scene.start('Garage'));
     this.input.keyboard?.once('keydown-Z', start);
     this.input.keyboard?.once('keydown-ENTER', start);
     this.input.once('pointerdown', start);

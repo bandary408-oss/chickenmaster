@@ -1,0 +1,153 @@
+{
+  "core_reactor": {
+    "name": "리액터 코어", "slot": "core", "rarity": "common", "tags": ["energy"],
+    "coreColor": "#2ce8f5",
+    "desc": "청록빛 맥동! 이 박동 주기, 교과서에 실린 그 리액터 맞지?",
+    "levels": [
+      { "stats": { "fireRatePct": 10 } },
+      { "stats": { "fireRatePct": 20 } },
+      { "stats": { "fireRatePct": 30 } }
+    ]
+  },
+  "core_overheat": {
+    "name": "과열 코어", "slot": "core", "rarity": "rare", "tags": ["heat"],
+    "coreColor": "#ff8a3d",
+    "desc": "체력이 반 아래로 떨어지면 화력이 폭주한다. 위험할수록 아름다워!",
+    "levels": [
+      { "stats": { "lowHpDamagePct": 40 } },
+      { "stats": { "lowHpDamagePct": 60, "damagePct": 5 } },
+      { "stats": { "lowHpDamagePct": 90, "damagePct": 10 } }
+    ]
+  },
+
+  "weapon_vulcan": {
+    "name": "발칸 포", "slot": "mainWeapon", "rarity": "common", "tags": ["ballistic"], "visual": "vulcan",
+    "desc": "회전 포신의 저 곡선미… 연사는 남자의 로망이다.",
+    "levels": [
+      { "weapon": { "intervalMs": 80, "count": 1, "spreadDeg": 0, "speed": 480, "damage": 1, "bullet": "vulcan" } },
+      { "weapon": { "intervalMs": 75, "count": 2, "spreadDeg": 4, "speed": 500, "damage": 1, "bullet": "vulcan" } },
+      { "weapon": { "intervalMs": 70, "count": 3, "spreadDeg": 8, "speed": 520, "damage": 1.1, "bullet": "vulcan" } }
+    ]
+  },
+  "weapon_laser": {
+    "name": "레이저 캐논", "slot": "mainWeapon", "rarity": "common", "tags": ["energy"], "visual": "laser",
+    "desc": "적을 꿰뚫고 지나간다. 관통 판정 계산식을 손으로 써 보고 싶을 정도야.",
+    "levels": [
+      { "weapon": { "intervalMs": 140, "count": 1, "spreadDeg": 0, "speed": 900, "damage": 1.6, "pierce": 2, "bullet": "laser" } },
+      { "weapon": { "intervalMs": 130, "count": 1, "spreadDeg": 0, "speed": 950, "damage": 2.2, "pierce": 3, "bullet": "laser" } },
+      { "weapon": { "intervalMs": 120, "count": 2, "spreadDeg": 2, "speed": 1000, "damage": 2.4, "pierce": 5, "bullet": "laser" } }
+    ]
+  },
+  "weapon_shotgun": {
+    "name": "산탄포", "slot": "mainWeapon", "rarity": "common", "tags": ["ballistic"], "visual": "shotgun",
+    "desc": "근접 전용 무식한 화력. 반동 흡수 댐퍼만 봐도 설렌다.",
+    "levels": [
+      { "weapon": { "intervalMs": 380, "count": 5, "spreadDeg": 30, "speed": 420, "damage": 1.2, "rangePx": 230, "bullet": "pellet" } },
+      { "weapon": { "intervalMs": 340, "count": 7, "spreadDeg": 34, "speed": 430, "damage": 1.3, "rangePx": 250, "bullet": "pellet" } },
+      { "weapon": { "intervalMs": 300, "count": 9, "spreadDeg": 38, "speed": 440, "damage": 1.4, "rangePx": 270, "bullet": "pellet" } }
+    ]
+  },
+  "weapon_missile": {
+    "name": "유도 미사일", "slot": "mainWeapon", "rarity": "rare", "tags": ["heat"], "visual": "missile",
+    "desc": "알아서 쫓아간다. 시커 헤드를 분해해 보고 싶은 충동을 참는 중.",
+    "levels": [
+      { "weapon": { "intervalMs": 280, "count": 2, "spreadDeg": 40, "speed": 240, "damage": 2.5, "homing": 4, "bullet": "missile" } },
+      { "weapon": { "intervalMs": 260, "count": 3, "spreadDeg": 50, "speed": 250, "damage": 2.6, "homing": 4.5, "bullet": "missile" } },
+      { "weapon": { "intervalMs": 240, "count": 4, "spreadDeg": 60, "speed": 260, "damage": 3, "homing": 5, "bullet": "missile" } }
+    ]
+  },
+
+  "sub_drone": {
+    "name": "지원 드론", "slot": "subWeapon", "rarity": "common", "tags": ["drone"],
+    "desc": "졸졸 따라오며 같이 쏜다. 이름은 '삐삐'로 지었다.",
+    "levels": [
+      { "sub": { "kind": "drone", "count": 1, "intervalMs": 300, "damage": 0.8 } },
+      { "sub": { "kind": "drone", "count": 1, "intervalMs": 200, "damage": 0.9 } },
+      { "sub": { "kind": "drone", "count": 2, "intervalMs": 200, "damage": 1 } }
+    ]
+  },
+  "sub_shieldbit": {
+    "name": "실드 비트", "slot": "subWeapon", "rarity": "rare", "tags": ["energy", "drone"],
+    "desc": "기체 주위를 돌며 적탄을 지운다. 궤도 반경이 황금비에 가깝다(아마도).",
+    "levels": [
+      { "sub": { "kind": "shieldbit", "count": 1, "radius": 26, "speedDeg": 200 } },
+      { "sub": { "kind": "shieldbit", "count": 2, "radius": 26, "speedDeg": 220 } },
+      { "sub": { "kind": "shieldbit", "count": 3, "radius": 28, "speedDeg": 240 } }
+    ]
+  },
+  "sub_sideturret": {
+    "name": "측면 포탑", "slot": "subWeapon", "rarity": "common", "tags": ["ballistic"],
+    "desc": "위아래 비스듬히 쏜다. 사각지대 따위 용납 못 해.",
+    "levels": [
+      { "sub": { "kind": "turret", "intervalMs": 400, "damage": 1, "anglesDeg": [-30, 30] } },
+      { "sub": { "kind": "turret", "intervalMs": 300, "damage": 1, "anglesDeg": [-30, 30] } },
+      { "sub": { "kind": "turret", "intervalMs": 300, "damage": 1.1, "anglesDeg": [-45, -20, 20, 45] } }
+    ]
+  },
+
+  "armor_light": {
+    "name": "경장갑", "slot": "armor", "rarity": "common", "tags": [], "visual": "light",
+    "desc": "얇고 빠르다. 맞으면 아프다. 그래도 이 날렵한 실루엣!",
+    "levels": [
+      { "stats": { "maxHp": -20, "speedPct": 15 } },
+      { "stats": { "maxHp": -15, "speedPct": 20 } },
+      { "stats": { "maxHp": -10, "speedPct": 25 } }
+    ]
+  },
+  "armor_heavy": {
+    "name": "중장갑", "slot": "armor", "rarity": "common", "tags": ["ballistic"], "visual": "heavy",
+    "desc": "두껍다. 무겁다. 든든하다. 장갑 두께 측정은 나중에 꼭 해야지.",
+    "levels": [
+      { "stats": { "maxHp": 40, "speedPct": -10 } },
+      { "stats": { "maxHp": 60, "speedPct": -8 } },
+      { "stats": { "maxHp": 80, "speedPct": -5 } }
+    ]
+  },
+  "armor_reactive": {
+    "name": "반응장갑", "slot": "armor", "rarity": "rare", "tags": ["heat"], "visual": "reactive",
+    "desc": "맞는 순간 터져서 주변 탄을 날려 버린다. 폭발은 예술이야.",
+    "levels": [
+      { "stats": { "maxHp": 10, "hitClearRadius": 60 } },
+      { "stats": { "maxHp": 20, "hitClearRadius": 100, "invulnMs": 250 } },
+      { "stats": { "maxHp": 30, "hitClearRadius": 160, "invulnMs": 500 } }
+    ]
+  },
+
+  "booster_dash": {
+    "name": "대시 부스터", "slot": "booster", "rarity": "common", "tags": ["heat"], "visual": "dash",
+    "desc": "노즐이 크면 빠르다. 이건 과학이다.",
+    "levels": [
+      { "stats": { "speedPct": 15 } },
+      { "stats": { "speedPct": 25 } },
+      { "stats": { "speedPct": 35 } }
+    ]
+  },
+  "booster_hover": {
+    "name": "호버 부스터", "slot": "booster", "rarity": "common", "tags": ["energy"], "visual": "hover",
+    "desc": "정밀 이동이 부드러워지고 스치기가 쉬워진다. 미세 조정의 쾌감!",
+    "levels": [
+      { "stats": { "focusSpeedPct": 30, "grazeRadius": 4 } },
+      { "stats": { "focusSpeedPct": 45, "grazeRadius": 7 } },
+      { "stats": { "focusSpeedPct": 60, "grazeRadius": 10 } }
+    ]
+  },
+
+  "module_caliber": {
+    "name": "고구경 탄창", "slot": "module", "rarity": "common", "tags": ["ballistic"],
+    "desc": "탄이 굵어지면 화력도 굵어진다.",
+    "levels": [
+      { "stats": { "damagePct": 10 } },
+      { "stats": { "damagePct": 18 } },
+      { "stats": { "damagePct": 26 } }
+    ]
+  },
+  "module_coolant": {
+    "name": "냉각 모듈", "slot": "module", "rarity": "common", "tags": ["energy"],
+    "desc": "포신이 식으면 더 빨리 쏠 수 있다. 냉각수 색이 예쁘다.",
+    "levels": [
+      { "stats": { "fireRatePct": 8 } },
+      { "stats": { "fireRatePct": 14 } },
+      { "stats": { "fireRatePct": 20 } }
+    ]
+  }
+}
