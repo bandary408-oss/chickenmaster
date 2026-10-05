@@ -86,7 +86,8 @@ export function generateSectorMap(): SectorMap {
   }
 
   for (const n of nodes) {
-    if (n.kind === 'battle') n.ref = Phaser.Utils.Array.GetRandom(BATTLE_STAGES);
+    // 첫 전투는 가장 쉬운 스테이지로 고정해 시작 기체로도 버틸 수 있게 한다.
+    if (n.kind === 'battle') n.ref = n.col === 0 ? BATTLE_STAGES[0] : Phaser.Utils.Array.GetRandom(BATTLE_STAGES);
     else if (n.kind === 'elite') n.ref = Phaser.Utils.Array.GetRandom(ELITE_STAGES);
     else if (n.kind === 'boss') n.ref = 'boss_1';
     else if (n.kind === 'event') n.ref = Phaser.Utils.Array.GetRandom(EVENTS);

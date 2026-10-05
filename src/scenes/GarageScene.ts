@@ -1,9 +1,10 @@
 import Phaser from 'phaser';
+import { sfx } from '../audio/Sfx';
 import { COLORS, GAME_HEIGHT, GAME_WIDTH } from '../config';
 import { MechView } from '../objects/MechView';
 import { computeStats, getPart, loadLoadout, maxLevel, partsForSlot, saveLoadout } from '../parts/Loadout';
 import type { EquippedPart, Loadout, SlotKind } from '../parts/types';
-import { levelLabel } from '../ui/text';
+import { UI_FONT, levelLabel } from '../ui/text';
 
 interface Row {
   label: string;
@@ -25,7 +26,7 @@ const ROWS: Row[] = [
   })),
 ];
 
-const FONT = { fontFamily: 'monospace', color: COLORS.text, resolution: 3 } as const;
+const FONT = UI_FONT;
 const ROW_Y0 = 40;
 const ROW_H = 22;
 
@@ -114,6 +115,7 @@ export class GarageScene extends Phaser.Scene {
   }
 
   private refresh() {
+    sfx('select');
     ROWS.forEach((r, i) => {
       const e = r.get(this.loadout);
       const name = e ? `${getPart(e.id).name}  ${levelLabel(e)}` : '- 비어 있음 -';

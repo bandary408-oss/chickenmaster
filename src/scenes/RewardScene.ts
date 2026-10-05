@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { sfx } from '../audio/Sfx';
 import { COLORS, GAME_HEIGHT, GAME_WIDTH } from '../config';
 import { SYNERGIES, getPart } from '../parts/Loadout';
 import type { PartDef, SlotKind } from '../parts/types';
@@ -107,6 +108,7 @@ export class RewardScene extends Phaser.Scene {
 
   private move(d: number) {
     this.cursor = Phaser.Math.Wrap(this.cursor + d, 0, this.options.length);
+    sfx('select');
     this.refresh();
   }
 
@@ -125,6 +127,7 @@ export class RewardScene extends Phaser.Scene {
     const run = getRun(this.registry)!;
     const o = this.options[this.cursor];
     if (!o) return;
+    sfx('powerup');
 
     if (o.kind === 'branch') {
       const data: ChoiceSceneData = {

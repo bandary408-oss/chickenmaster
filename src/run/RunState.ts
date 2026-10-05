@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { computeStats, defaultLoadout } from '../parts/Loadout';
 import type { Loadout } from '../parts/types';
 import { generateSectorMap, type SectorMap } from './MapGen';
+import { loadMeta } from '../meta/Meta';
 
 /** 한 판(런) 동안 유지되는 상태. 죽으면 통째로 버린다. */
 export interface RunState {
@@ -21,6 +22,10 @@ const KEY = 'run';
 
 export function newRun(registry: Phaser.Data.DataManager): RunState {
   const loadout = defaultLoadout();
+  // 설계실에서 고른 시작 장비
+  const meta = loadMeta();
+  loadout.core = { id: meta.startCore, level: 1 };
+  loadout.mainWeapon = { id: meta.startWeapon, level: 1 };
   const run: RunState = {
     sector: 1,
     loadout,

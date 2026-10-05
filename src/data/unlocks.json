@@ -1,0 +1,12 @@
+{
+  "part_weapon_missile":  { "kind": "part", "partId": "weapon_missile",  "cost": 20, "name": "유도 미사일 설계도", "desc": "보상에 유도 미사일이 나온다." },
+  "part_sub_shieldbit":   { "kind": "part", "partId": "sub_shieldbit",   "cost": 25, "name": "실드 비트 설계도", "desc": "보상에 실드 비트가 나온다." },
+  "part_armor_reactive":  { "kind": "part", "partId": "armor_reactive",  "cost": 25, "name": "반응장갑 설계도", "desc": "보상에 반응장갑이 나온다." },
+  "part_booster_hover":   { "kind": "part", "partId": "booster_hover",   "cost": 15, "name": "호버 부스터 설계도", "desc": "보상에 호버 부스터가 나온다." },
+  "part_module_coolant":  { "kind": "part", "partId": "module_coolant",  "cost": 15, "name": "냉각 모듈 설계도", "desc": "보상에 냉각 모듈이 나온다." },
+  "part_core_overheat":   { "kind": "part", "partId": "core_overheat",   "cost": 30, "name": "과열 코어 설계도", "desc": "보상에 과열 코어가 나온다." },
+  "start_core_overheat":  { "kind": "startCore", "partId": "core_overheat", "cost": 30, "requires": "part_core_overheat", "name": "시작 코어: 과열 코어", "desc": "런을 과열 코어로 시작할 수 있다." },
+  "start_weapon_laser":   { "kind": "startWeapon", "partId": "weapon_laser",   "cost": 25, "name": "시작 무기: 레이저 캐논", "desc": "런을 레이저 캐논으로 시작할 수 있다." },
+  "start_weapon_shotgun": { "kind": "startWeapon", "partId": "weapon_shotgun", "cost": 25, "name": "시작 무기: 산탄포", "desc": "런을 산탄포로 시작할 수 있다." },
+  "start_weapon_missile": { "kind": "startWeapon", "partId": "weapon_missile", "cost": 35, "requires": "part_weapon_missile", "name": "시작 무기: 유도 미사일", "desc": "런을 유도 미사일로 시작할 수 있다." }
+}

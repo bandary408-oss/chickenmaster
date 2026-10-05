@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { sfx } from '../audio/Sfx';
 import { COLORS, GAME_HEIGHT, GAME_WIDTH } from '../config';
 import { UI_FONT } from '../ui/text';
 
@@ -76,6 +77,7 @@ export class ChoiceScene extends Phaser.Scene {
 
   private move(d: number) {
     this.cursor = Phaser.Math.Wrap(this.cursor + d, 0, this.data_.options.length);
+    sfx('select');
     this.refresh();
   }
 
@@ -83,8 +85,10 @@ export class ChoiceScene extends Phaser.Scene {
     const o = this.data_.options[this.cursor];
     if (o.disabledReason) {
       this.cameras.main.shake(80, 0.004);
+      sfx('denied');
       return;
     }
+    sfx('confirm');
     o.onPick(this);
   }
 

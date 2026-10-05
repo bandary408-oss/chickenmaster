@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { COLORS, ENEMY_BULLET_POOL, GAME_HEIGHT, GAME_WIDTH } from '../config';
+import { COLORS, ENEMY_BULLET_POOL, GAME_HEIGHT, GAME_WIDTH, RENDER_SCALE } from '../config';
 import { createBulletGroup, spawnBullet } from '../objects/Bullet';
 import { BULLET_STYLES, PATTERNS, firePattern } from '../systems/BulletPatterns';
 
@@ -29,11 +29,11 @@ export class PatternLabScene extends Phaser.Scene {
     this.target = this.add.circle(GAME_WIDTH * 0.2, GAME_HEIGHT / 2, 4, COLORS.player);
 
     this.info = this.add
-      .text(8, 8, '', { fontFamily: 'monospace', fontSize: '10px', color: COLORS.text, lineSpacing: 2, backgroundColor: '#0b0d17cc' })
+      .text(8, 8, '', { fontFamily: 'monospace', resolution: RENDER_SCALE, fontSize: '10px', color: COLORS.text, lineSpacing: 2, backgroundColor: '#0b0d17cc' })
       .setDepth(10);
     this.add
       .text(8, GAME_HEIGHT - 8, '←/→: PATTERN   SPACE: STRESS 1000+   ESC: TITLE', {
-        fontFamily: 'monospace',
+        fontFamily: 'monospace', resolution: RENDER_SCALE,
         fontSize: '8px',
         color: COLORS.text,
       })

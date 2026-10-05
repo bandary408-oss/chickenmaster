@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { PARTS, getPart } from '../parts/Loadout';
 import type { EquippedPart, Loadout, PartDef, SlotKind } from '../parts/types';
+import { lockedPartIds } from '../meta/Meta';
 
 export type RewardOption =
   | { kind: 'new'; part: PartDef }
@@ -46,8 +47,9 @@ function optionFor(l: Loadout, p: PartDef): RewardOption | null {
  * guaranteeRare면 희귀 이상이 최소 하나 (엘리트·이벤트 보상).
  */
 export function rollRewards(l: Loadout, count: number, guaranteeRare: boolean): RewardOption[] {
+  const locked = lockedPartIds();
   const pool = Object.values(PARTS)
-    .filter((p) => !p.branchOf)
+    .filter((p) => !p.branchOf && !locked.has(p.id))
     .map((p) => optionFor(l, p))
     .filter((o): o is RewardOption => o !== null);
 

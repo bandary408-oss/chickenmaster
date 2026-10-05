@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { COLORS, ENEMY_BULLET_POOL, GAME_HEIGHT, GAME_WIDTH, PLAYER } from '../config';
+import { COLORS, ENEMY_BULLET_POOL, OVERDRIVE, GAME_HEIGHT, GAME_WIDTH, PLAYER, RENDER_SCALE } from '../config';
 import enemyDefs from '../data/enemies.json';
 import stageData from '../data/stages.json';
 import stageTest from '../data/stage_test.json';
@@ -11,6 +11,7 @@ import { computeStats, loadLoadout } from '../parts/Loadout';
 import { completeNode, endRun, getRun, type RunState } from '../run/RunState';
 import type { MapNode } from '../run/MapGen';
 import { UI_FONT } from '../ui/text';
+import { sfx } from '../audio/Sfx';
 import type { PlayerBulletKind } from '../parts/types';
 import { firePattern, getPattern } from '../systems/BulletPatterns';
 import { SubWeapons } from '../systems/SubWeapons';
@@ -48,6 +49,9 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
   private wasd!: Record<'up' | 'down' | 'left' | 'right', Phaser.Input.Keyboard.Key>;
   private focusKey!: Phaser.Input.Keyboard.Key;
   private fireKey!: Phaser.Input.Keyboard.Key;
+  private odGauge = 0;
+  private odUntil = 0;
+  private odAura!: Phaser.GameObjects.Arc;
 
   private stageTime = 0;
   private waveIndex = 0;
@@ -148,6 +152,10 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
     this.wasd = kb.addKeys({ up: 'W', down: 'S', left: 'A', right: 'D' }) as typeof this.wasd;
     this.focusKey = kb.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
     this.fireKey = kb.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
+    this.odGauge = 0;
+    this.odUntil = 0;
+    this.odAura = this.add.circle(0, 0, 18).setStrokeStyle(2, 0xffd23f).setDepth(4).setVisible(false);
+    kb.on('keydown-C', () => this.tryOverdrive());
     kb.on('keydown-ESC', () => {
       if (this.run) endRun(this.registry);
       this.scene.start('Title');
@@ -168,7 +176,9 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
     this.steerHomingBullets(delta);
     this.enemies.getChildren().forEach((e) => (e as Enemy).tick(delta, this));
     this.checkGraze();
+    this.updateOverdrive(time);
     this.hud.update(this.player.hp, this.player.stats.maxHp, this.score, this.graze);
+    this.hud.updateOverdrive(this.odGauge / OVERDRIVE.max, this.player.overdrive);
     this.hud.updateBoss(this.boss);
     this.checkStageClear();
   }
@@ -184,6 +194,7 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
     // 페이즈가 바뀌면 화면의 적탄을 지워 숨 돌릴 틈을 준다.
     this.clearEnemyBulletsNear(enemy.x, enemy.y, 9999);
     this.cameras.main.flash(150, 255, 255, 255);
+    sfx('bossPhase');
   }
 
   private updateWaves(delta: number) {
@@ -227,6 +238,7 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
       bullet.kill();
     }
     if (enemy.takeDamage(bullet.damage) === 'dead') this.onEnemyKilled(enemy);
+    else sfx('hit');
   }
 
   private onEnemyKilled(enemy: Enemy) {
@@ -235,6 +247,9 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
     // 스크랩: 적 점수 100점당 1, 엘리트 스테이지는 1.5배
     this.scrapEarned += Math.ceil((enemy.def.score / 100) * (this.node?.kind === 'elite' ? 1.5 : 1));
     this.sparks.explode(enemy.def.hp >= 10 ? 40 : 12, enemy.x, enemy.y);
+    this.explosionRing(enemy.x, enemy.y, Math.max(enemy.width, enemy.height));
+    this.odGauge = Math.min(OVERDRIVE.max, this.odGauge + OVERDRIVE.perKill);
+    sfx(enemy === this.boss ? 'bigExplode' : 'explode');
     enemy.kill();
     if (enemy === this.boss) {
       this.boss = null;
@@ -296,7 +311,9 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
 
     if (this.fireKey.isDown && time >= this.nextShotAt) {
       this.fireMainWeapon();
-      this.nextShotAt = time + this.player.stats.weapon.intervalMs / this.player.stats.fireRateMul;
+      const odRate = this.player.overdrive ? OVERDRIVE.fireRateMul : 1;
+      this.nextShotAt = time + this.player.stats.weapon.intervalMs / (this.player.stats.fireRateMul * odRate);
+      sfx('shot');
     }
   }
 
@@ -337,6 +354,8 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
   private onPlayerHit(bullet: Bullet | null) {
     const damage = bullet ? PLAYER.bulletHitDamage : PLAYER.bodyHitDamage;
     if (!this.player.hurt(damage, this.time.now)) return;
+    sfx('hurt');
+    this.cameras.main.flash(120, 255, 60, 90);
     bullet?.kill();
     this.clearEnemyBulletsNear(this.player.x, this.player.y, this.player.stats.hitClearRadius);
     if (!this.player.alive) this.onGameOver();
@@ -357,10 +376,44 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
       if (dx * dx + dy * dy <= r2) {
         b.grazed = true;
         this.graze++;
+        this.odGauge = Math.min(OVERDRIVE.max, this.odGauge + OVERDRIVE.perGraze);
+        sfx('graze');
         this.score += 10;
         this.grazeFx.explode(3, (px + b.x) / 2, (py + b.y) / 2);
       }
     }
+  }
+
+  // --- 오버드라이브 ---
+
+  private tryOverdrive() {
+    if (this.gameOver || this.cleared || this.player.overdrive) return;
+    if (this.odGauge < OVERDRIVE.max) {
+      sfx('denied');
+      return;
+    }
+    this.odGauge = 0;
+    this.odUntil = this.time.now + OVERDRIVE.durationMs;
+    this.player.overdrive = true;
+    // 발동 순간 화면의 적탄을 모두 지운다.
+    this.clearEnemyBulletsNear(this.player.x, this.player.y, 9999);
+    this.cameras.main.flash(200, 255, 210, 63);
+    sfx('overdrive');
+    this.showBanner('OVERDRIVE!', '"이게 바로 이 기체의 진짜 힘이다!"');
+  }
+
+  private updateOverdrive(time: number) {
+    if (this.player.overdrive && time >= this.odUntil) this.player.overdrive = false;
+    this.odAura.setVisible(this.player.overdrive && this.player.alive);
+    if (this.player.overdrive) {
+      this.odAura.setPosition(this.player.x, this.player.y).setScale(1 + Math.sin(time / 60) * 0.15);
+    }
+  }
+
+  /** 적이 터질 때 퍼지는 고리 */
+  private explosionRing(x: number, y: number, size: number) {
+    const ring = this.add.circle(x, y, size / 2).setStrokeStyle(2, 0xffd23f).setDepth(7);
+    this.tweens.add({ targets: ring, scale: 2.4, alpha: 0, duration: 320, ease: 'Cubic.easeOut', onComplete: () => ring.destroy() });
   }
 
   private clearEnemyBulletsNear(x: number, y: number, radius: number) {
@@ -375,6 +428,8 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
 
   private onGameOver() {
     this.gameOver = true;
+    this.player.overdrive = false;
+    sfx('bigExplode');
     this.sparks.explode(60, this.player.x, this.player.y);
     this.player.explode();
     this.hud.update(0, this.player.stats.maxHp, this.score, this.graze);
@@ -382,7 +437,7 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
 
     const cx = GAME_WIDTH / 2;
     this.add
-      .text(cx, GAME_HEIGHT * 0.42, 'GAME OVER', { fontFamily: 'monospace', fontSize: '28px', color: COLORS.accent })
+      .text(cx, GAME_HEIGHT * 0.42, 'GAME OVER', { fontFamily: 'monospace', resolution: RENDER_SCALE, fontSize: '28px', color: COLORS.accent })
       .setOrigin(0.5)
       .setDepth(200);
 
@@ -395,7 +450,7 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
     }
 
     this.add
-      .text(cx, GAME_HEIGHT * 0.56, 'Z: RETRY   ESC: TITLE', { fontFamily: 'monospace', fontSize: '12px', color: COLORS.text })
+      .text(cx, GAME_HEIGHT * 0.56, 'Z: RETRY   ESC: TITLE', { fontFamily: 'monospace', resolution: RENDER_SCALE, fontSize: '12px', color: COLORS.text })
       .setOrigin(0.5)
       .setDepth(200);
 

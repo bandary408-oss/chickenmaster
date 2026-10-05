@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { COLORS, GAME_HEIGHT, GAME_WIDTH, PLAYER } from '../config';
+import { COLORS, GAME_HEIGHT, GAME_WIDTH, OVERDRIVE, PLAYER } from '../config';
 import type { PlayerStats } from '../parts/types';
 import { MechView } from './MechView';
 
@@ -11,6 +11,8 @@ const EDGE_Y = 12;
  */
 export class Player extends Phaser.Physics.Arcade.Image {
   hp: number;
+  /** 오버드라이브 중이면 화력과 연사가 오른다 (기획서 4.1, 6장) */
+  overdrive = false;
   readonly view: MechView;
   private invulnUntil = 0;
   private hitboxDot: Phaser.GameObjects.Arc;
@@ -45,7 +47,7 @@ export class Player extends Phaser.Physics.Arcade.Image {
   /** 과열 코어 등: 체력이 절반 아래면 추가 화력 */
   get damageMul() {
     const low = this.hp < this.stats.maxHp / 2 ? this.stats.lowHpDamageMul : 1;
-    return this.stats.damageMul * low;
+    return this.stats.damageMul * low * (this.overdrive ? OVERDRIVE.damageMul : 1);
   }
 
   isInvulnerable(now: number) {

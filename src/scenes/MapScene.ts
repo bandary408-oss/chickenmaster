@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { sfx } from '../audio/Sfx';
 import { COLORS, GAME_HEIGHT, GAME_WIDTH } from '../config';
 import eventData from '../data/events.json';
 import { computeStats, equippedList, getPart, maxLevel } from '../parts/Loadout';
@@ -124,6 +125,7 @@ export class MapScene extends Phaser.Scene {
 
   private move(d: number) {
     this.cursor = Phaser.Math.Wrap(this.cursor + d, 0, this.choices.length);
+    sfx('select');
     this.refresh();
   }
 
@@ -138,6 +140,7 @@ export class MapScene extends Phaser.Scene {
 
   private enter() {
     const n = this.run.map.nodes[this.choices[this.cursor]];
+    sfx('confirm');
     switch (n.kind) {
       case 'battle':
       case 'elite':

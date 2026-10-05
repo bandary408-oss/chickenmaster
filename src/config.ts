@@ -1,6 +1,11 @@
 // 게임 전역 상수. 기획서 3장: 640×360 픽셀아트, 정수 배율 확대.
 export const GAME_WIDTH = 640;
 export const GAME_HEIGHT = 360;
+/**
+ * 실제 캔버스는 2배 해상도(1280×720)로 그리고, 카메라 줌 2로 640×360 세계를 보여 준다.
+ * 픽셀아트는 그대로 두 배가 되고, 글자는 2배 해상도로 그려져 한글이 뭉개지지 않는다.
+ */
+export const RENDER_SCALE = 2;
 
 export const COLORS = {
   background: 0x0b0d17,
@@ -32,6 +37,16 @@ export const PLAYER = {
   bodyHitDamage: 25,
   // 적탄 중심이 이 거리 안을 스치면 그레이즈 (기획서 6장)
   grazeRadius: 14,
+} as const;
+
+/** 오버드라이브: 그레이즈와 처치로 게이지를 채우고 C로 발동 */
+export const OVERDRIVE = {
+  max: 100,
+  perGraze: 4,
+  perKill: 1,
+  durationMs: 5000,
+  damageMul: 1.5,
+  fireRateMul: 2,
 } as const;
 
 /** 적탄 풀 크기. 기획서 6장 목표: 1,000발에서 60fps. */
