@@ -1,32 +1,32 @@
 {
   "aimed_single": {
-    "count": 1, "speed": 130
+    "count": 1, "speed": 110
   },
   "aimed_fan5": {
-    "count": 5, "spreadDeg": 60, "speed": 110
+    "count": 5, "spreadDeg": 60, "speed": 95
   },
   "aimed_stream": {
-    "count": 3, "spreadDeg": 20, "speed": 170, "bursts": 4, "burstGapMs": 90
+    "count": 3, "spreadDeg": 20, "speed": 140, "bursts": 3, "burstGapMs": 90
   },
   "ring16": {
     "aim": "fixed", "count": 16, "spreadDeg": 360, "speed": 90, "bullet": "large"
   },
   "ring_layered": {
-    "aim": "fixed", "count": 20, "spreadDeg": 360, "speed": 70, "layers": 3, "speedStep": 25
+    "aim": "fixed", "count": 16, "spreadDeg": 360, "speed": 65, "layers": 3, "speedStep": 25
   },
   "spiral": {
-    "aim": "fixed", "angleDeg": 180, "count": 4, "spreadDeg": 360, "speed": 100,
-    "bursts": 24, "burstGapMs": 70, "rotateDegPerBurst": 11
+    "aim": "fixed", "angleDeg": 180, "count": 3, "spreadDeg": 360, "speed": 85,
+    "bursts": 20, "burstGapMs": 70, "rotateDegPerBurst": 11
   },
   "spiral_double": {
-    "aim": "fixed", "count": 6, "spreadDeg": 360, "speed": 85,
-    "bursts": 30, "burstGapMs": 60, "rotateDegPerBurst": 9, "curveDegPerSec": 25
+    "aim": "fixed", "count": 5, "spreadDeg": 360, "speed": 75,
+    "bursts": 24, "burstGapMs": 60, "rotateDegPerBurst": 9, "curveDegPerSec": 25
   },
   "random_spray": {
-    "count": 10, "spreadDeg": 70, "speed": 120, "randomSpeed": 50, "randomAngleDeg": 6,
+    "count": 6, "spreadDeg": 70, "speed": 100, "randomSpeed": 40, "randomAngleDeg": 6,
     "bursts": 3, "burstGapMs": 150
   },
   "accel_fan": {
-    "count": 7, "spreadDeg": 90, "speed": 30, "accel": 160, "maxSpeed": 260, "bullet": "large"
+    "count": 7, "spreadDeg": 90, "speed": 30, "accel": 120, "maxSpeed": 200, "bullet": "large"
   }
 }

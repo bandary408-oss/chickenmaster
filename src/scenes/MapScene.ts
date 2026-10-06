@@ -23,8 +23,8 @@ const KIND_STYLE: Record<NodeKind, { color: number; label: string; name: string 
   boss: { color: 0xffd23f, label: '보', name: '섹터 보스' },
 };
 
-const REPAIR_HP = 35;
-const REPAIR_COST = 30;
+const REPAIR_HP = 50;
+const REPAIR_COST = 20;
 const UPGRADE_COST = 60;
 
 const MAP_X0 = 50;
@@ -200,7 +200,7 @@ export class MapScene extends Phaser.Scene {
             s.scene.start('Choice', { title: '무엇을 강화할까?', status: this.status(), options });
           },
         },
-        { label: '그냥 떠난다', detail: '체력 +10 (쉬어 가기)', onPick: (s) => ((run.hp = Math.min(max, run.hp + 10)), back(s)) },
+        { label: '그냥 떠난다', detail: '체력 +20 (쉬어 가기)', onPick: (s) => ((run.hp = Math.min(max, run.hp + 20)), back(s)) },
       ],
     };
   }

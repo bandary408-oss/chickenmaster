@@ -85,7 +85,7 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
       this.node = this.run.map.nodes[data.nodeId];
       this.stage = STAGES[this.node.ref!];
       // 섹터 안쪽으로 갈수록, 엘리트일수록 적이 단단해진다.
-      this.hpMul = (1 + 0.1 * this.node.col) * (this.node.kind === 'elite' ? 1.4 : 1);
+      this.hpMul = (1 + 0.06 * this.node.col) * (this.node.kind === 'elite' ? 1.3 : 1);
     }
   }
 
@@ -274,11 +274,11 @@ export class GameScene extends Phaser.Scene implements EnemyHost {
     this.cleared = true;
     this.clearEnemyBulletsNear(this.player.x, this.player.y, 9999);
     const bossStage = this.node?.kind === 'boss';
-    this.showBanner(bossStage ? 'SECTOR CLEAR!' : 'STAGE CLEAR', `스크랩 +${this.scrapEarned}`);
+    this.showBanner(bossStage ? 'SECTOR CLEAR!' : 'STAGE CLEAR', bossStage ? `스크랩 +${this.scrapEarned}` : `스크랩 +${this.scrapEarned} · 체력 +${PLAYER.clearHeal}`);
 
     this.time.delayedCall(2200, () => {
       const run = this.run!;
-      run.hp = this.player.hp;
+      run.hp = Math.min(this.player.stats.maxHp, this.player.hp + PLAYER.clearHeal);
       run.score += this.score;
       run.scrap += this.scrapEarned;
       run.kills += this.kills;

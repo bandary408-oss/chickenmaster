@@ -20,7 +20,7 @@
     },
     "fire": {
       "pattern": "aimed_single",
-      "intervalMs": 1600,
+      "intervalMs": 2200,
       "firstDelayMs": 600
     }
   },
@@ -36,13 +36,13 @@
     },
     "fire": {
       "pattern": "random_spray",
-      "intervalMs": 1500,
+      "intervalMs": 2400,
       "firstDelayMs": 500
     }
   },
   "gunship": {
     "texture": "enemy_gunship",
-    "hp": 30,
+    "hp": 24,
     "score": 800,
     "move": {
       "kind": "hold",
@@ -52,13 +52,13 @@
     },
     "fire": {
       "pattern": "aimed_fan5",
-      "intervalMs": 900,
+      "intervalMs": 1400,
       "firstDelayMs": 800
     }
   },
   "spinner": {
     "texture": "enemy_spinner",
-    "hp": 45,
+    "hp": 36,
     "score": 1500,
     "move": {
       "kind": "hold",
@@ -68,13 +68,13 @@
     },
     "fire": {
       "pattern": "spiral",
-      "intervalMs": 2600,
+      "intervalMs": 3400,
       "firstDelayMs": 700
     }
   },
   "boss_rooster": {
     "texture": "enemy_boss_rooster",
-    "hp": 600,
+    "hp": 420,
     "score": 10000,
     "boss": true,
     "name": "강철 수탉 MK-I",
@@ -91,12 +91,12 @@
         "fires": [
           {
             "pattern": "aimed_fan5",
-            "intervalMs": 900,
+            "intervalMs": 1300,
             "firstDelayMs": 1200
           },
           {
             "pattern": "ring16",
-            "intervalMs": 2200,
+            "intervalMs": 3000,
             "firstDelayMs": 2000
           }
         ]
@@ -106,12 +106,12 @@
         "fires": [
           {
             "pattern": "spiral_double",
-            "intervalMs": 2400,
+            "intervalMs": 3200,
             "firstDelayMs": 500
           },
           {
             "pattern": "aimed_stream",
-            "intervalMs": 1400,
+            "intervalMs": 2000,
             "firstDelayMs": 900
           }
         ]
@@ -121,17 +121,17 @@
         "fires": [
           {
             "pattern": "ring_layered",
-            "intervalMs": 1800,
+            "intervalMs": 2600,
             "firstDelayMs": 400
           },
           {
             "pattern": "random_spray",
-            "intervalMs": 900,
+            "intervalMs": 1500,
             "firstDelayMs": 700
           },
           {
             "pattern": "accel_fan",
-            "intervalMs": 2600,
+            "intervalMs": 3600,
             "firstDelayMs": 1500
           }
         ]

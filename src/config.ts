@@ -28,15 +28,17 @@ export const PLAYER = {
   maxHp: 100,
   speed: 160,
   focusSpeed: 70,
-  // 기획서 2장: 히트박스 4~6px. 지름 6px 원.
-  hitboxRadius: 3,
-  invulnMs: 1500,
+  // 기획서 2장: 히트박스 4~6px. 지름 4px 원 (난이도 완화).
+  hitboxRadius: 2,
+  invulnMs: 2000,
   // 피격 시 이 반경 안의 적탄을 지운다 (기획서 6장).
-  hitClearRadius: 80,
-  bulletHitDamage: 20,
-  bodyHitDamage: 25,
+  hitClearRadius: 110,
+  bulletHitDamage: 12,
+  bodyHitDamage: 15,
   // 적탄 중심이 이 거리 안을 스치면 그레이즈 (기획서 6장)
-  grazeRadius: 14,
+  grazeRadius: 16,
+  /** 스테이지 클리어 때마다 회복하는 체력 */
+  clearHeal: 15,
 } as const;
 
 /** 오버드라이브: 그레이즈와 처치로 게이지를 채우고 C로 발동 */
